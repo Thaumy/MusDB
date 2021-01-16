@@ -24,6 +24,7 @@ namespace MusDB
 
         static void Main(string[] args)
         {
+            /*
             Put("初始化MusDB数据库服务..................[ ]");
             Console.SetCursorPosition(40, Console.CursorTop - 1);
             var MySqlManager = new MySqlManager(new("localhost", 3306, "root", "65a1561425f744e2b541303f628963f8"), "musdb");
@@ -36,11 +37,11 @@ namespace MusDB
 
             Put($"当前数据库记录存留：{result}");
             Put("按任意键收集数据");
-
+            */
             (int flac, int mp3, int etc) count = (0, 0, 0);
 
             List<FileInfo> ectList = new();
-            List<string> md5List = new();
+            List<(string name, string md5)> md5List = new();
 
             void fun(string path)
             {
@@ -61,13 +62,13 @@ namespace MusDB
                             Put(temp.Name);
                             count.flac++;
 
-                            using (MD5 MD5 = MD5.Create())
+                            using (SHA256 SHA256 = SHA256.Create())
                             {
-                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open))
+                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open, FileAccess.Read))
                                 {
-                                    byte[] hashByte1 = MD5.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组 
-                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串 
-                                    md5List.Add(str1);
+                                    byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
+                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
+                                    md5List.Add(new(temp.FullName, str1));
                                 }
                             }
 
@@ -77,13 +78,13 @@ namespace MusDB
                             Put(temp.Name);
                             count.mp3++;
 
-                            using (MD5 MD5 = MD5.Create())
+                            using (SHA256 SHA256 = SHA256.Create())
                             {
-                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open))
+                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open, FileAccess.Read))
                                 {
-                                    byte[] hashByte1 = MD5.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组 
-                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串 
-                                    md5List.Add(str1);
+                                    byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
+                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
+                                    md5List.Add(new(temp.FullName, str1));
                                 }
                             }
                         }
@@ -112,14 +113,25 @@ namespace MusDB
 
             Put("冲突项目：");
             var a = md5List
-                    .GroupBy(x => x)
+                    .GroupBy(x => x.md5)
                     .Where(g => g.Count() > 1)
-                    .Select(y => y.Key)
-                    .ToList();
+                    .Select(y => y.Key);
 
-            foreach (var v in a)
+            var b = from c in md5List group c by c.md5;
+
+            foreach (var v in b)
             {
-                Put(v);
+                var s = from c in md5List
+                        where c.md5 == v.Key
+                        select c.name;
+                if (s.ToList().Count > 1)
+                {
+                    foreach (var k in s)
+                    {
+                        Put(k);
+                    }
+                    Put("");
+                }
             }
             Put("检查完成。");
 
