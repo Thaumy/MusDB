@@ -4,6 +4,10 @@ using System.Collections;
 
 using WaterLibrary.MySQL;
 using System.Collections.Generic;
+using System.Linq;
+
+using WaterLibrary.Util;
+using System.Security.Cryptography;
 
 namespace MusDB
 {
@@ -36,6 +40,7 @@ namespace MusDB
             (int flac, int mp3, int etc) count = (0, 0, 0);
 
             List<FileInfo> ectList = new();
+            List<string> md5List = new();
 
             void fun(string path)
             {
@@ -55,11 +60,32 @@ namespace MusDB
                         {
                             Put(temp.Name);
                             count.flac++;
+
+                            using (MD5 MD5 = MD5.Create())
+                            {
+                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open))
+                                {
+                                    byte[] hashByte1 = MD5.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组 
+                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串 
+                                    md5List.Add(str1);
+                                }
+                            }
+
                         }
                         else if (temp.Name.Contains(".mp3"))
                         {
                             Put(temp.Name);
                             count.mp3++;
+
+                            using (MD5 MD5 = MD5.Create())
+                            {
+                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open))
+                                {
+                                    byte[] hashByte1 = MD5.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组 
+                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串 
+                                    md5List.Add(str1);
+                                }
+                            }
                         }
                         else
                         {
@@ -68,17 +94,35 @@ namespace MusDB
                             count.etc++;
                         }
                     }
+                    Console.SetCursorPosition(110, Console.CursorTop - 1);
+                    Put((count.flac + count.mp3 + count.etc).ToString());
                 }
             }
 
             fun(@"D:\Thaumy的乐库\Playlists\.喵喵喵");
 
+
             Put("");
             Put($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+
             foreach (var el in ectList)
             {
                 Put(el.FullName);
             }
+
+            Put("冲突项目：");
+            var a = md5List
+                    .GroupBy(x => x)
+                    .Where(g => g.Count() > 1)
+                    .Select(y => y.Key)
+                    .ToList();
+
+            foreach (var v in a)
+            {
+                Put(v);
+            }
+            Put("检查完成。");
+
             Pause();
         }
     }
