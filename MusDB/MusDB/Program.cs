@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Collections;
 
 using WaterLibrary.MySQL;
+using System.Collections.Generic;
 
 namespace MusDB
 {
@@ -31,14 +33,15 @@ namespace MusDB
             Put($"当前数据库记录存留：{result}");
             Put("按任意键收集数据");
 
-            int count = 0;
+            (int flac, int mp3, int etc) count = (0, 0, 0);
+
+            List<FileInfo> ectList = new();
 
             void fun(string path)
             {
                 DirectoryInfo dic = new DirectoryInfo(path);
                 FileSystemInfo[] allin = dic.GetFileSystemInfos();
 
-                var f = dic.GetFiles("*flac*");
                 foreach (var el in allin)
                 {
                     if (el is DirectoryInfo)
@@ -47,16 +50,35 @@ namespace MusDB
                     }
                     else
                     {
-                        Put(el.FullName);
-                        count++;
+                        var temp = (FileInfo)el;
+                        if (temp.Name.Contains(".flac"))
+                        {
+                            Put(temp.Name);
+                            count.flac++;
+                        }
+                        else if (temp.Name.Contains(".mp3"))
+                        {
+                            Put(temp.Name);
+                            count.mp3++;
+                        }
+                        else
+                        {
+                            Put(temp.Name);
+                            ectList.Add(temp);
+                            count.etc++;
+                        }
                     }
                 }
             }
 
             fun(@"D:\Thaumy的乐库\Playlists\.喵喵喵");
 
-            Put($"一共找到flac文件：{count}");
-
+            Put("");
+            Put($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+            foreach (var el in ectList)
+            {
+                Put(el.FullName);
+            }
             Pause();
         }
     }
