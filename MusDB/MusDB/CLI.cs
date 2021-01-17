@@ -16,7 +16,7 @@ namespace MusDB
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void Put(string text) => Console.WriteLine(text);
+        public static void Put(string text) => Console.Write(text);
 
         public static void Pause() => Console.ReadKey();
         public static void Pause(string text)
@@ -24,6 +24,7 @@ namespace MusDB
             Console.WriteLine(text); Console.ReadKey();
         }
 
+        public static void Line(string text) => Console.WriteLine(text);
         public static void Line() => Console.WriteLine();
 
         public static void InPosition(int left, int right, Action todo)

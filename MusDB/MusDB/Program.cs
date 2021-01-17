@@ -17,41 +17,38 @@ namespace MusDB
         static void Main(string[] args)
         {
 
-            CLI.Put("初始化MusDB数据库服务..................[ ]");
+            CLI.Line("初始化MusDB数据库服务..................[ ]");
             var MySqlManager = new MySqlManager(new("localhost", 3306, "root", "65a1561425f744e2b541303f628963f8"), "musdb");
             CLI.InPosition(40, Console.CursorTop - 1,
                         () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
-            CLI.Put("统计信息...............................[ ]");
+            CLI.Line("统计信息...............................[ ]");
             var result = MySqlManager.GetKey("SELECT COUNT(*) FROM statistics");
             CLI.InPosition(40, Console.CursorTop - 1,
                        () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
-            CLI.Put($"当前数据库记录存留：{result}");
+            CLI.Line($"当前数据库记录存留：{result}");
             CLI.Pause("按任意键收集数据");
 
             (int flac, int mp3, int etc) count = (0, 0, 0);
+            int total = 0;
 
-            List<FileInfo> ectList = new();
-            List<(string name, string md5)> md5List = new();
+            List<FileInfo> ETC = new();
+            List<(string name, string md5)> Music = new();
 
             (string, string) ToSHA256(string path)
             {
                 using SHA256 SHA256 = SHA256.Create();
-                using FileStream file1 = new FileStream(path, FileMode.Open, FileAccess.Read);
+                using FileStream File = new FileStream(path, FileMode.Open, FileAccess.Read);
 
-                byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
-                string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
+                string result = BitConverter.ToString(SHA256.ComputeHash(File));
 
-                return new(path, str1);
+                return new(path, result);
             }
 
             void fun(string path)
             {
-                DirectoryInfo dic = new DirectoryInfo(path);
-                FileSystemInfo[] allin = dic.GetFileSystemInfos();
-
-                foreach (var el in allin)
+                foreach (var el in new DirectoryInfo(path).GetFileSystemInfos())
                 {
                     if (el is DirectoryInfo)
                     {
@@ -59,30 +56,35 @@ namespace MusDB
                     }
                     else
                     {
+                        CLI.Put(total.ToString().PadLeft(4, '0'));
                         var temp = (FileInfo)el;
                         if (temp.Name.Contains(".flac"))
                         {
-                            CLI.Put(temp.Name);
+                            CLI.Line(" | flac  " + temp.Name);
                             count.flac++;
+                            Music.Add(ToSHA256(temp.FullName));
 
-                            md5List.Add(ToSHA256(temp.FullName));
+                            CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
+                               () => { CLI.Line(temp.DirectoryName); });
                         }
                         else if (temp.Name.Contains(".mp3"))
                         {
-                            CLI.Put(temp.Name);
+                            CLI.Line(" |  mp3  " + temp.Name);
                             count.mp3++;
 
-                            md5List.Add(ToSHA256(temp.FullName));
+                            Music.Add(ToSHA256(temp.FullName));
+                            CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
+                               () => { CLI.Line(temp.DirectoryName); });
                         }
                         else
                         {
-                            CLI.Put(temp.Name);
-                            ectList.Add(temp);
+                            CLI.Line(temp.Name);
+                            ETC.Add(temp);
                             count.etc++;
                         }
+                        total++;
                     }
-                    CLI.InPosition(Console.WindowWidth - 5, Console.CursorTop - 1,
-                        () => { CLI.Put((count.flac + count.mp3 + count.etc).ToString()); });
+
                 }
             }
 
@@ -90,32 +92,27 @@ namespace MusDB
 
 
             CLI.Line();
-            CLI.Put($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+            CLI.Line($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
             CLI.Line();
 
-            foreach (var el in ectList)
+            foreach (var el in ETC)
             {
-                CLI.Put(el.FullName);
+                CLI.Line(el.FullName);
             }
 
-            CLI.Put("冲突项目：");
-            var a = md5List
-                    .GroupBy(x => x.md5)
-                    .Where(g => g.Count() > 1)
-                    .Select(y => y.Key);
+            CLI.Line("冲突项目：");
 
-            var b = from c in md5List group c by c.md5;
-
-            foreach (var v in b)
+            foreach (var el in from el in Music group el by el.md5)
             {
-                var s = from c in md5List
-                        where c.md5 == v.Key
-                        select c.name;
-                if (s.ToList().Count > 1)
+                var conflict = (from it in Music
+                                where it.md5 == el.Key
+                                select it.name).ToList();
+
+                if (conflict.Count > 1)
                 {
-                    foreach (var k in s)
+                    foreach (var it in conflict)
                     {
-                        CLI.Put(k);
+                        CLI.Line(it);
                     }
                     CLI.Line();
                 }
