@@ -102,20 +102,16 @@ namespace MusDB
 
             CLI.Line("冲突项目：");
 
-            foreach (var el in from el in Music group el by el.md5)
-            {
-                var conflict = (from it in Music
-                                where it.md5 == el.Key
-                                select it.name).ToList();
+            var conflicts = from el in (from el in Music group el by el.md5) where el.Count() > 1 select el;
 
-                if (conflict.Count > 1)
+            foreach (var el in conflicts)
+            {
+                foreach (var it in el)
                 {
-                    foreach (var it in conflict)
-                    {
-                        CLI.Line(it);
-                    }
-                    CLI.Line();
+                    CLI.Line(it.name);
                 }
+                CLI.Line();
+
             }
 
             CLI.Pause("检查完成。");
