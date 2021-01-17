@@ -16,20 +16,20 @@ namespace MusDB
     {
         static void Main(string[] args)
         {
-            /*
-            Put("初始化MusDB数据库服务..................[ ]");
-            Console.SetCursorPosition(40, Console.CursorTop - 1);
+
+            CLI.Put("初始化MusDB数据库服务..................[ ]");
             var MySqlManager = new MySqlManager(new("localhost", 3306, "root", "65a1561425f744e2b541303f628963f8"), "musdb");
-            ShowGreen(() => Console.WriteLine("O"));
+            CLI.InPosition(40, Console.CursorTop - 1,
+                        () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
-            Put("统计信息...............................[ ]");
-            Console.SetCursorPosition(40, Console.CursorTop - 1);
+            CLI.Put("统计信息...............................[ ]");
             var result = MySqlManager.GetKey("SELECT COUNT(*) FROM statistics");
-            ShowGreen(() => Console.WriteLine("O"));
+            CLI.InPosition(40, Console.CursorTop - 1,
+                       () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
-            Put($"当前数据库记录存留：{result}");
-            Pause("按任意键收集数据");
-            */
+            CLI.Put($"当前数据库记录存留：{result}");
+            CLI.Pause("按任意键收集数据");
+
             (int flac, int mp3, int etc) count = (0, 0, 0);
 
             List<FileInfo> ectList = new();
@@ -81,8 +81,8 @@ namespace MusDB
                             count.etc++;
                         }
                     }
-                    Console.SetCursorPosition(110, Console.CursorTop - 1);
-                    CLI.Put((count.flac + count.mp3 + count.etc).ToString());
+                    CLI.InPosition(Console.WindowWidth - 5, Console.CursorTop - 1,
+                        () => { CLI.Put((count.flac + count.mp3 + count.etc).ToString()); });
                 }
             }
 
