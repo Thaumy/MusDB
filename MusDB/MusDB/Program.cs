@@ -6,6 +6,8 @@ using WaterLibrary.MySQL;
 using System.Collections.Generic;
 using System.Linq;
 
+using MySql.Data.MySqlClient;
+using MySql;
 using MusDB;
 using WaterLibrary.Util;
 using System.Security.Cryptography;
@@ -30,7 +32,7 @@ namespace MusDB
             CLI.Line($"当前数据库记录存留：{result}");
             CLI.Pause("按任意键收集数据");
 
-            (int flac, int mp3, int etc) count = (0, 0, 0);
+            (int flac, int mp3, int etc) = (0, 0, 0);
             int total = 0;
 
             List<FileInfo> ETC = new();
@@ -46,6 +48,35 @@ namespace MusDB
                 return new(path, result);
             }
 
+            void db(string name, string md5, string file_type)
+            {
+                MySqlManager.DoInConnection(conn =>
+                {
+                    using MySqlCommand MySqlCommand = new MySqlCommand
+                    {
+                        CommandText = string.Format("INSERT INTO statistics (name,md5,file_type) VALUES (\"{0}\",\"{1}\",\"{2}\");",
+                        name, md5, file_type
+                        ),
+
+                        Connection = conn,
+
+                        /* 开始事务 */
+                        Transaction = conn.BeginTransaction()
+                    };
+
+                    if (MySqlCommand.ExecuteNonQuery() == 1)
+                    {
+                        /* 指向表修改1行数据，拷贝表删除1行数据 */
+                        MySqlCommand.Transaction.Commit();
+                        return true;
+                    }
+                    else
+                    {
+                        MySqlCommand.Transaction.Rollback();
+                        return false;
+                    }
+                });
+            }
             void fun(string path)
             {
                 foreach (var el in new DirectoryInfo(path).GetFileSystemInfos())
@@ -61,8 +92,11 @@ namespace MusDB
                         if (temp.Name.Contains(".flac"))
                         {
                             CLI.Line(" | flac  " + temp.Name);
-                            count.flac++;
-                            Music.Add(ToSHA256(temp.FullName));
+                            flac++;
+
+                            var md5 = ToSHA256(temp.FullName);
+                            Music.Add(md5);
+                            db(temp.Name, md5.Item2, "flac");
 
                             CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
                                () => { CLI.Line(temp.DirectoryName); });
@@ -70,9 +104,12 @@ namespace MusDB
                         else if (temp.Name.Contains(".mp3"))
                         {
                             CLI.Line(" |  mp3  " + temp.Name);
-                            count.mp3++;
+                            mp3++;
 
-                            Music.Add(ToSHA256(temp.FullName));
+                            var md5 = ToSHA256(temp.FullName);
+                            Music.Add(md5);
+                            db(temp.Name, md5.Item2, "mp3");
+
                             CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
                                () => { CLI.Line(temp.DirectoryName); });
                         }
@@ -80,7 +117,7 @@ namespace MusDB
                         {
                             CLI.Line(temp.Name);
                             ETC.Add(temp);
-                            count.etc++;
+                            etc++;
                         }
                         total++;
                     }
@@ -92,7 +129,7 @@ namespace MusDB
 
 
             CLI.Line();
-            CLI.Line($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+            CLI.Line($"flac:{flac}  mp3:{mp3}  其他:{etc}");
             CLI.Line();
 
             foreach (var el in ETC)
