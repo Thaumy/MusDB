@@ -6,6 +6,7 @@ using WaterLibrary.MySQL;
 using System.Collections.Generic;
 using System.Linq;
 
+using MusDB;
 using WaterLibrary.Util;
 using System.Security.Cryptography;
 
@@ -13,15 +14,6 @@ namespace MusDB
 {
     class Program
     {
-        static void ShowGreen(Action todo)
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            todo();
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        static void Put(string str) => Console.WriteLine(str);
-        static void Pause() => Console.ReadKey();
-
         static void Main(string[] args)
         {
             /*
@@ -36,12 +28,23 @@ namespace MusDB
             ShowGreen(() => Console.WriteLine("O"));
 
             Put($"当前数据库记录存留：{result}");
-            Put("按任意键收集数据");
+            Pause("按任意键收集数据");
             */
             (int flac, int mp3, int etc) count = (0, 0, 0);
 
             List<FileInfo> ectList = new();
             List<(string name, string md5)> md5List = new();
+
+            (string, string) ToSHA256(string path)
+            {
+                using SHA256 SHA256 = SHA256.Create();
+                using FileStream file1 = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+                byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
+                string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
+
+                return new(path, str1);
+            }
 
             void fun(string path)
             {
@@ -59,59 +62,43 @@ namespace MusDB
                         var temp = (FileInfo)el;
                         if (temp.Name.Contains(".flac"))
                         {
-                            Put(temp.Name);
+                            CLI.Put(temp.Name);
                             count.flac++;
 
-                            using (SHA256 SHA256 = SHA256.Create())
-                            {
-                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open, FileAccess.Read))
-                                {
-                                    byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
-                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
-                                    md5List.Add(new(temp.FullName, str1));
-                                }
-                            }
-
+                            md5List.Add(ToSHA256(temp.FullName));
                         }
                         else if (temp.Name.Contains(".mp3"))
                         {
-                            Put(temp.Name);
+                            CLI.Put(temp.Name);
                             count.mp3++;
 
-                            using (SHA256 SHA256 = SHA256.Create())
-                            {
-                                using (FileStream file1 = new FileStream(temp.FullName, FileMode.Open, FileAccess.Read))
-                                {
-                                    byte[] hashByte1 = SHA256.ComputeHash(file1);//哈希算法根据文本得到哈希码的字节数组
-                                    string str1 = BitConverter.ToString(hashByte1);//将字节数组装换为字符串
-                                    md5List.Add(new(temp.FullName, str1));
-                                }
-                            }
+                            md5List.Add(ToSHA256(temp.FullName));
                         }
                         else
                         {
-                            Put(temp.Name);
+                            CLI.Put(temp.Name);
                             ectList.Add(temp);
                             count.etc++;
                         }
                     }
                     Console.SetCursorPosition(110, Console.CursorTop - 1);
-                    Put((count.flac + count.mp3 + count.etc).ToString());
+                    CLI.Put((count.flac + count.mp3 + count.etc).ToString());
                 }
             }
 
             fun(@"D:\Thaumy的乐库\Playlists\.喵喵喵");
 
 
-            Put("");
-            Put($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+            CLI.Line();
+            CLI.Put($"flac:{count.flac}  mp3:{count.mp3}  其他:{count.etc}");
+            CLI.Line();
 
             foreach (var el in ectList)
             {
-                Put(el.FullName);
+                CLI.Put(el.FullName);
             }
 
-            Put("冲突项目：");
+            CLI.Put("冲突项目：");
             var a = md5List
                     .GroupBy(x => x.md5)
                     .Where(g => g.Count() > 1)
@@ -128,14 +115,13 @@ namespace MusDB
                 {
                     foreach (var k in s)
                     {
-                        Put(k);
+                        CLI.Put(k);
                     }
-                    Put("");
+                    CLI.Line();
                 }
             }
-            Put("检查完成。");
 
-            Pause();
+            CLI.Pause("检查完成。");
         }
     }
 }
