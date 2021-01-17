@@ -9,12 +9,13 @@ namespace MusDB
     class CLI
     {
         private CLI() { }
-        public static void ShowGreen(Action todo)
+        public static void InColor(ConsoleColor Color, Action todo)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = Color;
             todo();
             Console.ForegroundColor = ConsoleColor.White;
         }
+
         public static void Put(string text) => Console.WriteLine(text);
 
         public static void Pause() => Console.ReadKey();
@@ -24,5 +25,11 @@ namespace MusDB
         }
 
         public static void Line() => Console.WriteLine();
+
+        public static void InPosition(int left, int right, Action todo)
+        {
+            Console.SetCursorPosition(left, right);
+            todo();
+        }
     }
 }
