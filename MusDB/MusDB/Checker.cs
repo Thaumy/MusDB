@@ -31,16 +31,15 @@ namespace MusDB
             return result;
         }
 
-        public static List<(string Name, string MD5, string file_type)> CheckFiles(string Path, out (int flac, int mp3, int etc, int total) Count)
+        public static List<(string Name, string MD5, string file_type)> CheckFiles(string Path, ref (int flac, int mp3, int etc, int total) Count)
         {
-            Count = (0, 0, 0, 0);
             List<(string Name, string MD5, string file_type)> Files = new();
 
             foreach (var el in new DirectoryInfo(Path).GetFileSystemInfos())
             {
                 if (el is DirectoryInfo)
                 {
-                    Files.AddRange(CheckFiles(el.FullName, out Count));
+                    Files.AddRange(CheckFiles(el.FullName, ref Count));
                 }
                 else
                 {
