@@ -40,6 +40,7 @@ namespace MusDB
                 if (el is DirectoryInfo)
                 {
                     Files.AddRange(CheckFiles(el.FullName, ref Count));
+                    CLI.Line();
                 }
                 else
                 {
@@ -74,7 +75,7 @@ namespace MusDB
                     else
                     {
                         CLI.Line(temp.Name);
-                        Files.Add(new(temp.FullName, "null", "null"));
+                        Files.Add(new(temp.FullName, "", ""));
 
                         Count.etc++;
                     }
@@ -85,21 +86,28 @@ namespace MusDB
             return Files;
         }
 
-        public static void CheckConflict(List<(string Name, string MD5)> Music)
+        public static IEnumerable<string> CheckETC(List<(string Name, string MD5, string file_type)> Files)
         {
-            var conflicts = from el in (from el in Music group el by el.MD5) where el.Count() > 1 select el;
+            return from el in Files where el.file_type == "" select el.Name;
+        }
+
+        public static List<List<string>> CheckConflict(List<(string Name, string MD5, string file_type)> Files)
+        {
+            var conflicts = from el in (from el in Files group el by el.MD5) where el.Count() > 1 select el;
+            List<List<string>> result = new();
             if (conflicts.Count() > 0)
             {
-                CLI.Line("冲突项目：");
                 foreach (var el in conflicts)
                 {
-                    foreach (var it in el)
+                    List<string> it = new();
+                    foreach (var inner_el in el)
                     {
-                        CLI.Line(it.Name);
+                        it.Add(inner_el.Name);
                     }
-                    CLI.Line();
+                    result.Add(it);
                 }
             }
+            return result;
         }
     }
 }

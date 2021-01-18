@@ -29,24 +29,31 @@ namespace MusDB
                        () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
             CLI.Line($"当前数据库记录存留：{result}");
-            CLI.Pause("按任意键收集数据");
+            CLI.Pause("按任意键收集数据\n");
 
-            List<FileInfo> ETC = new();
-            List<(string name, string md5)> Music = new();
             (int flac, int mp3, int etc, int total) Count = (0, 0, 0, 0);
 
-            Checker.CheckFiles(@"D:\Thaumy的乐库\Playlists\.喵喵喵", ref Count);
+            List<(string Name, string MD5, string file_type)> Files = Checker.CheckFiles(@"D:\Thaumy的乐库\Playlists\.喵喵喵", ref Count);
 
+            CLI.Line();
+            CLI.Line($"flac:{Count.flac}  mp3:{Count.mp3}\n");
+            CLI.Line($"共计:{Count.total}");
 
-            CLI.Line($"\nflac:{Count.flac}  mp3:{Count.mp3}  其他:{Count.etc}\n");
-
-
-            foreach (var el in ETC)
+            CLI.Line("其他项目：\n");
+            foreach (var el in Checker.CheckETC(Files))
             {
-                CLI.Line(el.FullName);
+                CLI.Line(el);
             }
 
-            Checker.CheckConflict(Music);
+            CLI.Line("\n冲突项目：\n");
+            foreach (var el in Checker.CheckConflict(Files))
+            {
+                foreach (var it in el)
+                {
+                    CLI.Line(it);
+                }
+                CLI.Line();
+            }
 
             CLI.InColor(ConsoleColor.Green, () => CLI.Pause("\n\a检查完成。"));
         }
