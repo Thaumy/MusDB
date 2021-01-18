@@ -29,12 +29,13 @@ namespace MusDB
                        () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
             CLI.Line($"当前数据库记录存留：{result}");
-            CLI.Pause("\a按任意键收集数据");
+            CLI.Pause("按任意键收集数据");
 
             List<FileInfo> ETC = new();
             List<(string name, string md5)> Music = new();
+            (int flac, int mp3, int etc, int total) Count = (0, 0, 0, 0);
 
-            Checker.CheckFiles(@"D:\Thaumy的乐库\Playlists\.喵喵喵", out (int flac, int mp3, int etc, int total) Count);
+            Checker.CheckFiles(@"D:\Thaumy的乐库\Playlists\.喵喵喵", ref Count);
 
 
             CLI.Line($"\nflac:{Count.flac}  mp3:{Count.mp3}  其他:{Count.etc}\n");
