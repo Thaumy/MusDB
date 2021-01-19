@@ -19,8 +19,16 @@ namespace MusDB
 {
     class Checker
     {
+        /// <summary>
+        /// 私有构造
+        /// </summary>
         private Checker() { }
 
+        /// <summary>
+        /// 文件转SHA256签名
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public static string ToSHA256(string path)
         {
             using SHA256 SHA256 = SHA256.Create();
@@ -31,9 +39,15 @@ namespace MusDB
             return result;
         }
 
-        public static List<(string Name, string MD5, string file_type)> CheckFiles(string Path, ref (int flac, int mp3, int etc, int total) Count)
+        /// <summary>
+        /// 检查某路径下的所有文件并计数
+        /// </summary>
+        /// <param name="Path"></param>
+        /// <param name="Count"></param>
+        /// <returns>所有文件的数据列表</returns>
+        public static List<(string Name, string MD5, string path, string file_type)> CheckFiles(string Path, ref (int flac, int mp3, int etc, int total) Count)
         {
-            List<(string Name, string MD5, string file_type)> Files = new();
+            List<(string Name, string MD5, string path, string file_type)> Files = new();
 
             foreach (var el in new DirectoryInfo(Path).GetFileSystemInfos())
             {
@@ -52,7 +66,7 @@ namespace MusDB
 
 
                         var result = ToSHA256(temp.FullName);
-                        Files.Add(new(temp.FullName, result, "flac"));
+                        Files.Add(new(temp.Name, result, temp.DirectoryName, "flac"));
 
                         CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
                            () => { CLI.Line(temp.DirectoryName); });
@@ -65,7 +79,7 @@ namespace MusDB
 
 
                         var result = ToSHA256(temp.FullName);
-                        Files.Add(new(temp.FullName, result, "mp3"));
+                        Files.Add(new(temp.Name, result, temp.DirectoryName, "mp3"));
 
                         CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
                            () => { CLI.Line(temp.DirectoryName); });
@@ -75,7 +89,7 @@ namespace MusDB
                     else
                     {
                         CLI.Line(temp.Name);
-                        Files.Add(new(temp.FullName, "", ""));
+                        Files.Add(new(temp.Name, "", temp.DirectoryName, ""));
 
                         Count.etc++;
                     }
@@ -86,12 +100,12 @@ namespace MusDB
             return Files;
         }
 
-        public static IEnumerable<string> CheckETC(List<(string Name, string MD5, string file_type)> Files)
+        public static IEnumerable<string> CheckETC(List<(string Name, string MD5, string path, string file_type)> Files)
         {
             return from el in Files where el.file_type == "" select el.Name;
         }
 
-        public static List<List<string>> CheckConflict(List<(string Name, string MD5, string file_type)> Files)
+        public static List<List<string>> CheckConflict(List<(string Name, string MD5, string path, string file_type)> Files)
         {
             var conflicts = from el in (from el in Files group el by el.MD5) where el.Count() > 1 select el;
             List<List<string>> result = new();
