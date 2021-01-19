@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using WaterLibrary.MySQL;
 
 using MySql.Data.MySqlClient;
-using MySql;
+using MySql.Data;
 using MusDB;
 using WaterLibrary.Util;
 using System.Security.Cryptography;
+
+using System.Data;
 
 namespace MusDB
 {
@@ -18,16 +20,53 @@ namespace MusDB
     {
         private readonly MySqlManager MySqlManager;
 
+        /// <summary>
+        /// 公有构造
+        /// </summary>
         public Database(string User, string PWD, string Database)
         {
             MySqlManager = new MySqlManager(new("localhost", 3306, User, PWD), Database);
         }
 
+        /// <summary>
+        /// 取得计数
+        /// </summary>
+        /// <returns></returns>
         public int GetCount()
         {
             return Convert.ToInt32(MySqlManager.GetKey("SELECT COUNT(*) FROM statistics"));
         }
 
+        /// <summary>
+        /// 取得所有数据
+        /// </summary>
+        /// <returns></returns>
+        public List<(string Name, string MD5, string path, string file_type)> GetAll()
+        {
+            var result = MySqlManager.GetTable("SELECT * FROM statistics").Rows;
+
+            List<(string Name, string MD5, string path, string file_type)> List = new();
+
+            foreach (DataRow Row in result)
+            {
+                (string Name, string MD5, string path, string file_type) it;
+
+                it.Name = Convert.ToString(Row["Name"]);
+                it.MD5 = Convert.ToString(Row["MD5"]);
+                it.path = Convert.ToString(Row["path"]);
+                it.file_type = Convert.ToString(Row["file_type"]);
+
+                List.Add(it);
+            }
+            return List;
+        }
+
+        /// <summary>
+        /// 更新数据
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="MD5"></param>
+        /// <param name="file_type"></param>
         public void Update(string Name, string MD5, string file_type)
         {
             MySqlManager.DoInConnection(conn =>
