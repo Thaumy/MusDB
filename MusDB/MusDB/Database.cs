@@ -41,19 +41,18 @@ namespace MusDB
         /// 取得所有数据
         /// </summary>
         /// <returns></returns>
-        public List<(string Name, string MD5, string path, string file_type)> GetAll()
+        public List<(string Name, string MD5, string file_type)> GetAll()
         {
             var result = MySqlManager.GetTable("SELECT * FROM statistics").Rows;
 
-            List<(string Name, string MD5, string path, string file_type)> List = new();
+            List<(string Name, string MD5, string file_type)> List = new();
 
             foreach (DataRow Row in result)
             {
-                (string Name, string MD5, string path, string file_type) it;
+                (string Name, string MD5, string file_type) it;
 
                 it.Name = Convert.ToString(Row["Name"]);
                 it.MD5 = Convert.ToString(Row["MD5"]);
-                it.path = Convert.ToString(Row["path"]);
                 it.file_type = Convert.ToString(Row["file_type"]);
 
                 List.Add(it);
