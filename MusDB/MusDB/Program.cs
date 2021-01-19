@@ -22,7 +22,8 @@ namespace MusDB
                        () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
             CLI.Line($"当前数据库记录存留：{result}");
-            CLI.Pause("按任意键收集数据\n");
+            CLI.Pause("按任意键收集数据");
+            CLI.Line();
 
             (int flac, int mp3, int etc, int total) Count = (0, 0, 0, 0);
 
@@ -48,30 +49,40 @@ namespace MusDB
                 CLI.Line();
             }
 
-            Console.Beep();
-            CLI.InColor(ConsoleColor.Green, () => CLI.Pause("\n检查完成，按任意键同步到数据库。"));
+            CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n\a检查完成，按任意键匹配数据"); CLI.Line(); });
 
-
-            List<(string Name, string MD5, string path, string file_type)> MusicFiles = (from el in AllFiles where el.file_type != "" select el).ToList();
+            List<(string Name, string MD5, string path, string file_type)> MusicFiles = (from el in AllFiles where el.file_type != "" select (el.Name, el.MD5, el.path, el.file_type)).ToList();
             var MusicInDB = DB.GetAll();
 
-            //剔除数据库中已有记录
+            CLI.Line("以下项目在本地文件中不存在：");
             foreach (var el in MusicInDB)
             {
-                MusicFiles.Remove(el);
+                int i = MusicFiles.FindIndex(x => x.Name == el.Name && x.MD5 == el.MD5 && x.file_type == el.file_type);//剔除数据库中已有记录
+                if (i != -1)
+                {
+                    MusicFiles.RemoveAt(i);
+                }
+                else
+                {
+                    CLI.Line(el.Name);
+                }
             }
+            CLI.Line("以下项目在数据库中不存在（本地新增）：");
             foreach (var el in MusicFiles)
             {
                 CLI.Line(el.Name);
+                CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
+                           () => { CLI.Line(el.path); });
             }
+            CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n按任意键将本地新增数据同步到数据库。"); CLI.Line(); });
 
-
-            foreach (var el in AllFiles)
+            foreach (var el in MusicFiles)
             {
                 DB.Update(el.Name, el.MD5, el.file_type);
-                CLI.Line(el.Name);
+                CLI.Line("已添加：" + el.Name);
             }
 
+            CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n\a任务完成，任意键退出。"); });
         }
     }
 }
