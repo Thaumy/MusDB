@@ -54,7 +54,7 @@ namespace MusDB
                 if (el is DirectoryInfo)
                 {
                     Files.AddRange(CheckFiles(el.FullName, ref Count));
-                    CLI.Line();
+                    CLI.Line = "\n";
                 }
                 else
                 {
@@ -62,33 +62,33 @@ namespace MusDB
                     var temp = (FileInfo)el;
                     if (temp.Name.Contains(".flac"))
                     {
-                        CLI.Line(" | flac  " + temp.Name);
+                        CLI.Line = " | flac  " + temp.Name;
 
 
                         var result = ToSHA256(temp.FullName);
                         Files.Add(new(temp.Name, result, temp.DirectoryName, "flac"));
 
                         CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
-                           () => { CLI.Line(temp.DirectoryName); });
+                           () => { CLI.Line = temp.DirectoryName; });
 
                         Count.flac++;
                     }
                     else if (temp.Name.Contains(".mp3"))
                     {
-                        CLI.Line(" |  mp3  " + temp.Name);
+                        CLI.Line = " |  mp3  " + temp.Name;
 
 
                         var result = ToSHA256(temp.FullName);
                         Files.Add(new(temp.Name, result, temp.DirectoryName, "mp3"));
 
                         CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
-                           () => { CLI.Line(temp.DirectoryName); });
+                           () => { CLI.Line = temp.DirectoryName; });
 
                         Count.mp3++;
                     }
                     else
                     {
-                        CLI.Line(temp.Name);
+                        CLI.Line = temp.Name;
                         Files.Add(new(temp.Name, "", temp.DirectoryName, ""));
 
                         Count.etc++;
