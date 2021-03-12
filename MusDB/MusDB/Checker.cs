@@ -32,7 +32,7 @@ namespace MusDB
         public static string ToSHA256(string path)
         {
             using SHA256 SHA256 = SHA256.Create();
-            using FileStream File = new FileStream(path, FileMode.Open, FileAccess.Read);
+            using FileStream File = new(path, FileMode.Open, FileAccess.Read);
 
             string result = BitConverter.ToString(SHA256.ComputeHash(File));
 

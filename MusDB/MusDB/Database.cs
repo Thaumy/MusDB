@@ -70,7 +70,7 @@ namespace MusDB
         {
             MySqlManager.DoInConnection(conn =>
             {
-                using MySqlCommand MySqlCommand = new MySqlCommand
+                using MySqlCommand MySqlCommand = new()
                 {
                     CommandText = string.Format("INSERT INTO statistics (name,md5,file_type) VALUES (\"{0}\",\"{1}\",\"{2}\");",
                     Name, MD5, file_type
