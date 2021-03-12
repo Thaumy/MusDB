@@ -12,7 +12,7 @@ using WaterLibrary.MySQL;
 using MySql.Data.MySqlClient;
 using MySql;
 using MusDB;
-using WaterLibrary.Util;
+using WaterLibrary.Utils;
 using System.Security.Cryptography;
 
 namespace MusDB
@@ -109,7 +109,7 @@ namespace MusDB
         {
             var conflicts = from el in (from el in Files group el by el.MD5) where el.Count() > 1 select el;
             List<List<string>> result = new();
-            if (conflicts.Count() > 0)
+            if (conflicts.Any())
             {
                 foreach (var el in conflicts)
                 {
