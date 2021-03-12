@@ -48,11 +48,13 @@ namespace MusDB
         /// 换行打印
         /// </summary>
         /// <param name="text"></param>
-        public static void Line(string text) => Console.WriteLine(text);
-        /// <summary>
-        /// 换行打印，此重载仅输出空行
-        /// </summary>
-        public static void Line() => Console.WriteLine();
+        public static string Line
+        {
+            set
+            {
+                Console.WriteLine(value);
+            }
+        }
 
         /// <summary>
         /// 在指定位置进行操作
