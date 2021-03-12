@@ -9,7 +9,7 @@ using WaterLibrary.MySQL;
 using MySql.Data.MySqlClient;
 using MySql.Data;
 using MusDB;
-using WaterLibrary.Util;
+using WaterLibrary.Utils;
 using System.Security.Cryptography;
 
 using System.Data;

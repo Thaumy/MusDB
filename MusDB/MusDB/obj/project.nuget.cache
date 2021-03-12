@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "bLQi2DnyaF1JHHwLq5l4TWUjAxfa7OdUJs7Jeixno4SxjWzapAFtroMAetnzC5/ARbdt9lAKBjpgKZPq+SfxnA==",
+  "dgSpecHash": "1yYaUBwoFhkvXgq/0eK1hsnZJXklGCu6XWKSzfKtj5c93gPJcyiZ0DXMmEUOWQRN/7VmB3UhknnZ7C0umHpBIw==",
   "success": true,
-  "projectFilePath": "H:\\C#工程\\MusDB\\MusDB\\MusDB\\MusDB.csproj",
+  "projectFilePath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\MusDB.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Thaumy\\.nuget\\packages\\bouncycastle.netcore\\1.8.3\\bouncycastle.netcore.1.8.3.nupkg.sha512",
     "C:\\Users\\Thaumy\\.nuget\\packages\\google.protobuf\\3.11.4\\google.protobuf.3.11.4.nupkg.sha512",

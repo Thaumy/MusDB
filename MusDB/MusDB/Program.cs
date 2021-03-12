@@ -4,6 +4,7 @@ using System.Collections;
 
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace MusDB
 {
@@ -11,8 +12,29 @@ namespace MusDB
     {
         static void Main(string[] args)
         {
+            string configPath = "./config.json";
+            string jsonString;
+            try
+            {
+                jsonString = File.ReadAllText(configPath, System.Text.Encoding.UTF8);
+            }
+            catch//找不到配置文件则创建
+            {
+                FileStream fileStream = new(configPath, FileMode.Create, FileAccess.Write);
+                StreamWriter streamWriter = new StreamWriter(fileStream);
+                streamWriter.WriteLine("{}");
+                streamWriter.Close();
+                fileStream.Close();
+
+                jsonString = File.ReadAllText(configPath, System.Text.Encoding.UTF8);
+            }
+            var jObject = JObject.Parse(jsonString);
+            var path = jObject["path"].ToString();
+            var databaseNode = jObject["database"];
+            (string db, string usr, string pwd) = (databaseNode["db"].ToString(), databaseNode["usr"].ToString(), databaseNode["pwd"].ToString());
+
             CLI.Line("初始化MusDB数据库服务..................[ ]");
-            Database DB = new("root", "65a1561425f744e2b541303f628963f8", "musdb");
+            Database DB = new(usr, pwd, db);
             CLI.InPosition(40, Console.CursorTop - 1,
                         () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
@@ -27,7 +49,7 @@ namespace MusDB
 
             (int flac, int mp3, int etc, int total) Count = (0, 0, 0, 0);
 
-            List<(string Name, string MD5, string path, string file_type)> AllFiles = Checker.CheckFiles(@"D:\Thaumy的乐库\Playlists\.喵喵喵", ref Count);
+            List<(string Name, string MD5, string path, string file_type)> AllFiles = Checker.CheckFiles(path, ref Count);
 
             CLI.Line();
             CLI.Line($"flac:{Count.flac}  mp3:{Count.mp3}\n");

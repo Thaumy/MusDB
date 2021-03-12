@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Reference Include="WaterLibrary">
-      <HintPath>..\..\..\..\博客项目\pilipala2008beta9\WaterLibrary\WaterLibrary\bin\Debug\net5.0\WaterLibrary.dll</HintPath>
+      <HintPath>H:\GitHub\WaterLibrary\1.1.7 - (preview)\WaterLibrary\WaterLibrary\bin\Debug\net5.0\WaterLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
 
