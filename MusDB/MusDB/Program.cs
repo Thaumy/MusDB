@@ -21,7 +21,7 @@ namespace MusDB
             catch//找不到配置文件则创建
             {
                 FileStream fileStream = new(configPath, FileMode.Create, FileAccess.Write);
-                StreamWriter streamWriter = new StreamWriter(fileStream);
+                StreamWriter streamWriter = new(fileStream);
                 streamWriter.WriteLine("{}");
                 streamWriter.Close();
                 fileStream.Close();
