@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using WaterLibrary.MySQL;
+using WaterLibrary.MySql;
 
 using MySql.Data.MySqlClient;
 using MySql.Data;
 using MusDB;
-using WaterLibrary.Utils;
 using System.Security.Cryptography;
 
 using System.Data;
