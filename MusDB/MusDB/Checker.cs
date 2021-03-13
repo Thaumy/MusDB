@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Collections;
 
-using WaterLibrary.MySQL;
+using WaterLibrary.MySql;
 
 using MySql.Data.MySqlClient;
 using MySql;
 using MusDB;
-using WaterLibrary.Utils;
 using System.Security.Cryptography;
 
 namespace MusDB
