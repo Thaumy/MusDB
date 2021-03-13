@@ -68,19 +68,19 @@ namespace MusDB
                 }
             }
             CLI.Line = "\n以下项目在数据库中不存在（本地新增）：";
-            foreach (var el in MusicFiles)
+            MusicFiles.ForEach((el) =>
             {
                 CLI.Line = el.Name;
                 CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
                            () => { CLI.Line = el.path; });
-            }
-            CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n按任意键将本地新增数据同步到数据库。"); CLI.Line = "\n"; });
+            });
 
-            foreach (var el in MusicFiles)
+            CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n按任意键将本地新增数据同步到数据库。"); CLI.Line = "\n"; });
+            MusicFiles.ForEach((el) =>
             {
                 DB.Update(el.Name, el.MD5, el.file_type);
                 CLI.Line = "已添加：" + el.Name;
-            }
+            });
 
             CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n\a任务完成，任意键退出。"); });
         }
