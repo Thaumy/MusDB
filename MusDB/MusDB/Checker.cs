@@ -100,9 +100,9 @@ namespace MusDB
             return Files;
         }
 
-        public static IEnumerable<string> CheckETC(List<(string Name, string MD5, string path, string file_type)> Files)
+        public static List<string> CheckETC(List<(string Name, string MD5, string path, string file_type)> Files)
         {
-            return from el in Files where el.file_type == "" select el.Name;
+            return (from el in Files where el.file_type == "" select el.Name).ToList();
         }
 
         public static List<List<string>> CheckConflict(List<(string Name, string MD5, string path, string file_type)> Files)

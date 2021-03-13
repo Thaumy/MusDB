@@ -10,31 +10,12 @@ namespace MusDB
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            string configPath = "./config.json";
-            string jsonString;
-            try
-            {
-                jsonString = File.ReadAllText(configPath, System.Text.Encoding.UTF8);
-            }
-            catch//找不到配置文件则创建
-            {
-                FileStream fileStream = new(configPath, FileMode.Create, FileAccess.Write);
-                StreamWriter streamWriter = new(fileStream);
-                streamWriter.WriteLine("{}");
-                streamWriter.Close();
-                fileStream.Close();
-
-                jsonString = File.ReadAllText(configPath, System.Text.Encoding.UTF8);
-            }
-            var jObject = JObject.Parse(jsonString);
-            var path = jObject["path"].ToString();
-            var databaseNode = jObject["database"];
-            (string db, string usr, string pwd) = (databaseNode["db"].ToString(), databaseNode["usr"].ToString(), databaseNode["pwd"].ToString());
+            Config.GetConfig(out string path, out (string usr, string pwd, string db) database);
 
             CLI.Line = "初始化MusDB数据库服务..................[ ]";
-            Database DB = new(usr, pwd, db);
+            Database DB = new(database.usr, database.pwd, database.db);
             CLI.InPosition(40, Console.CursorTop - 1,
                         () => { CLI.InColor(ConsoleColor.Green, () => Console.WriteLine("O")); });
 
@@ -56,20 +37,17 @@ namespace MusDB
             CLI.Line = $"共计:{Count.total}\n";
 
             CLI.Line = "其他项目：";
-            foreach (var el in Checker.CheckETC(AllFiles))
-            {
-                CLI.Line = el;
-            }
+            Checker.CheckETC(AllFiles).ForEach((el) => { CLI.Line = el; });
 
             CLI.Line = "\n冲突项目：\n";
-            foreach (var el in Checker.CheckConflict(AllFiles))
+            Checker.CheckConflict(AllFiles).ForEach((el)
+                =>
             {
-                foreach (var it in el)
-                {
-                    CLI.Line = it;
-                }
+                el.ForEach((it)
+               =>
+                { CLI.Line = it; });
                 CLI.Line = "\n";
-            }
+            });
 
             CLI.InColor(ConsoleColor.Green, () => { CLI.Pause("\n\a检查完成，按任意键匹配数据"); CLI.Line = "\n"; });
 
@@ -89,7 +67,7 @@ namespace MusDB
                     CLI.Line = el.Name;
                 }
             }
-            CLI.Line = "以下项目在数据库中不存在（本地新增）：";
+            CLI.Line = "\n以下项目在数据库中不存在（本地新增）：";
             foreach (var el in MusicFiles)
             {
                 CLI.Line = el.Name;
