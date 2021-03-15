@@ -1,23 +1,23 @@
 ﻿module Config
 
-open MySql.Data
 open Newtonsoft.Json.Linq
 open System.IO
 open System.Text
 
-type Config(x: int, y: int) =
-    let getConfig =
+type Config() =
+    member this.GetConfig() =
         let configPath = "./config.json" //配置文件搜索路径
 
         let jsonString =
             try //尝试获取配置文件
                 File.ReadAllText(configPath, Encoding.UTF8)
             with _ -> //找不到配置文件则创建
-                let fileStream =
+                use fileStream =
                     new FileStream(configPath, FileMode.Create, FileAccess.Write)
 
-                let streamWriter = new StreamWriter(fileStream)
+                use streamWriter = new StreamWriter(fileStream)
                 streamWriter.WriteLine("{}")
+
                 streamWriter.Close()
                 fileStream.Close()
 
