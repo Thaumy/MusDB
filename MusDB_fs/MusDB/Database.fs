@@ -14,7 +14,7 @@ type Database(user, pwd, database) =
         new MySqlManager(new MySqlConnMsg("localhost", 3306, user, pwd), database)
 
     let getKey =
-        mySqlManager.GetKey("SELECT COUNT(*) FROM statistics")
+        mySqlManager.GetKey("SELECT COUNT) FROM statistics")
 
     let getCount = Convert.ToInt32(getKey)
 
@@ -32,3 +32,23 @@ type Database(user, pwd, database) =
             list.Add((row.["Name"].ToString(), row.["MD5"].ToString(), row.["file_type"].ToString()))
 
         list
+
+    let update name md5 fileType =
+        mySqlManager.DoInConnection
+            (fun conn ->
+                let mySqlCommand =
+                    new MySqlCommand(
+                        CommandText =
+                            $"INSERT INTO statistics (name,md5,file_type) VALUES (\"{name}\",\"{md5}\",\"{fileType}\");",
+                        Connection = conn,
+                        Transaction = conn.BeginTransaction()
+                    )
+
+                if mySqlCommand.ExecuteNonQuery() = 1 then
+                    mySqlCommand.Transaction.Commit()
+                    true
+                else
+                    mySqlCommand.Transaction.Rollback()
+                    false
+
+                )
