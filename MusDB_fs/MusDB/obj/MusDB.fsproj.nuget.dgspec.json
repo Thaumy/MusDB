@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\MusDB.csproj": {}
+    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {}
   },
   "projects": {
-    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\MusDB.csproj": {
+    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\MusDB.csproj",
+        "projectUniqueName": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
         "projectName": "MusDB",
-        "projectPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\MusDB.csproj",
+        "projectPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
         "packagesPath": "C:\\Users\\Thaumy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB\\MusDB\\obj\\",
+        "outputPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,24 +33,26 @@
             "targetAlias": "net5.0",
             "projectReferences": {}
           }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
         }
       },
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
           "dependencies": {
+            "FSharp.Core": {
+              "target": "Package",
+              "version": "[5.0.0, )",
+              "generatePathProperty": true
+            },
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.23, )"
+              "version": "[8.0.23, )",
+              "generatePathProperty": true
             },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[12.0.3, )"
+              "version": "[12.0.3, )",
+              "generatePathProperty": true
             }
           },
           "imports": [

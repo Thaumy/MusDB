@@ -7,10 +7,6 @@ using System.Threading.Tasks;
 using WaterLibrary.MySql;
 
 using MySql.Data.MySqlClient;
-using MySql.Data;
-using MusDB;
-using System.Security.Cryptography;
-
 using System.Data;
 
 namespace MusDB
@@ -83,7 +79,6 @@ namespace MusDB
 
                 if (MySqlCommand.ExecuteNonQuery() == 1)
                 {
-                    /* 指向表修改1行数据，拷贝表删除1行数据 */
                     MySqlCommand.Transaction.Commit();
                     return true;
                 }
