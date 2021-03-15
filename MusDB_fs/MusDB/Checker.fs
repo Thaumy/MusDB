@@ -24,51 +24,14 @@ type TempStruct =
         val fileType: string
     end
 
-type Count=
+type Count =
     struct
-        val flac:int
-        val mp3:int
-        val etc:int 
-        val total:int
-     end
+        val flac: int
+        val mp3: int
+        val etc: int
+        val total: int
+    end
 
-let CheckFiles path (count:Count)=
-    let files = new List<TempStruct>()
-    
-    for el in DirectoryInfo(Path).GetFileSystemInfos() do
-        if el is DirectoryInfo then
-            files.AddRange(CheckFiles(el.FullName, ref Count));
-            //CLI.Line = "\n";
-        else
-            //CLI.Put(Count.total.ToString().PadLeft(4, '0'));
-            let temp = (FileInfo)el
-            if temp.Name.Contains(".flac") then
-                //CLI.Line = " | flac  " + temp.Name;
-                let result = ToSHA256(temp.FullName)
-                files.Add(temp.Name, result, temp.DirectoryName, "flac")
-    
-                //CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
-                //() => { CLI.Line = temp.DirectoryName; });
-    
-                count.flac++
-                elif temp.Name.Contains(".mp3") then
-                //CLI.Line = " |  mp3  " + temp.Name;
-    
-                let result = ToSHA256(temp.FullName);
-                files.Add(temp.Name, result, temp.DirectoryName, "mp3")
-    
-                //CLI.InPosition(Console.WindowWidth / 5 * 3, Console.CursorTop - 1,
-                //() => { CLI.Line = temp.DirectoryName; });
-    
-                count.mp3++
-                else
-                //CLI.Line = temp.Name
-                files.Add(temp.Name, "", temp.DirectoryName, "")
-                count.etc++
-                        
-        count.total++
-   
-    files
 
 let CheckETC (files: List<TempStruct>) =
     [ for el in files do
