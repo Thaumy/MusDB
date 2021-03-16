@@ -13,12 +13,10 @@ type Database(user, pwd, database) =
     let mySqlManager =
         new MySqlManager(new MySqlConnMsg("localhost", 3306, user, pwd), database)
 
-    let getKey =
-        mySqlManager.GetKey("SELECT COUNT) FROM statistics")
+    member this.GetCount =
+        Convert.ToInt32(mySqlManager.GetKey("SELECT COUNT) FROM statistics"))
 
-    let getCount = Convert.ToInt32(getKey)
-
-    let getAll =
+    member this.GetAll =
         let result =
             mySqlManager
                 .GetTable(
@@ -33,7 +31,7 @@ type Database(user, pwd, database) =
 
         list
 
-    let update name md5 fileType =
+    member this.Update name md5 fileType =
         mySqlManager.DoInConnection
             (fun conn ->
                 let mySqlCommand =

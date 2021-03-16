@@ -7,8 +7,8 @@ open System.Linq
 open System.IO
 open System.Security.Cryptography
 
-type Checker() =
-    let toSHA256 path =
+type Checker =
+    member this.ToSHA256 path =
         let sha256 = SHA256.Create()
 
         let file =
