@@ -4,8 +4,8 @@ open Newtonsoft.Json.Linq
 open System.IO
 open System.Text
 
-type Config =
-    member this.GetConfig() =
+type Config() =
+    member this.GetConfig =
         let configPath = "./config.json" //配置文件搜索路径
 
         let jsonString =
