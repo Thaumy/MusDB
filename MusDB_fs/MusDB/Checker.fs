@@ -1,14 +1,14 @@
 ﻿module Checker
 
 open System
-open System.Collections.Generic
-open System.Linq
-
 open System.IO
+open System.Linq
+open System.Collections.Generic
 open System.Security.Cryptography
 
+
 type Checker =
-    member this.ToSHA256 path =
+    member _this.ToSHA256 path =
         let sha256 = SHA256.Create()
 
         let file =

@@ -1,11 +1,12 @@
 ﻿module Config
 
-open Newtonsoft.Json.Linq
 open System.IO
 open System.Text
+open Newtonsoft.Json.Linq
+
 
 type Config() =
-    member this.GetConfig =
+    member _this.GetConfig =
         let configPath = "./config.json" //配置文件搜索路径
 
         let jsonString =

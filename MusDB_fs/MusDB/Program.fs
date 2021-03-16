@@ -1,10 +1,22 @@
 ﻿open System
 open Config
+open CLI
+open Database
 
-[<EntryPoint>]
-let main _ =
 
-    let (path, database) = Config.Config().GetConfig
-    let (usr, pwd, db) = database
 
-    0
+CLI.Line "初始化MusDB数据库服务..................[ ]"
+let (path, database) = Config().GetConfig
+
+CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Put "O"))
+
+CLI.Line "统计信息...............................[ ]"
+
+let result = Database(database).GetCount
+
+CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Put "O"))
+
+CLI.Line  $"当前数据库记录存留：{result}"
+CLI.Pause "按任意键收集数据\n"
+
+(**)

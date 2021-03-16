@@ -2,12 +2,9 @@
 
 open System
 open System.Collections.Generic
-open System.Linq
-open System.Text
-open System.Threading.Tasks
 open WaterLibrary.MySql
 open MySql.Data.MySqlClient
-open System.Data
+
 
 type Database(user, pwd, database) =
     let mySqlManager =

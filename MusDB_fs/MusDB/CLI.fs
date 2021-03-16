@@ -2,18 +2,27 @@
 
 open System
 
+
 type CLI =
 
-    member this.InColor color todo =
+    static member InColor color todo : unit =
         let _d = Console.ForegroundColor = color
         todo ()
-        Console.ForegroundColor = ConsoleColor.White
 
-    member this.InPosition left right todo =
+        Console.ForegroundColor = ConsoleColor.White
+        |> ignore
+
+
+    static member InPosition left right todo : unit =
         Console.SetCursorPosition(left, right)
         todo ()
 
-    member this.Pause = Console.ReadLine()
-    member this.Line(value: 'T) = Console.WriteLine(value)
+    static member Pause : unit = Console.ReadLine() |> ignore
 
-    member this.Put(value: 'T) = Console.Write(value)
+    static member Pause(text: 'T) : unit =
+        Console.Write(text)
+        Console.ReadLine() |> ignore
+
+    static member Line(text: 'T) : unit = Console.WriteLine(text)
+
+    static member Put(text: 'T) : unit = Console.Write(text)
