@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="CLI.fs" />
     <Compile Include="Checker.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Config.fs" />
