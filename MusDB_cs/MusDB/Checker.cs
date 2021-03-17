@@ -62,7 +62,7 @@ namespace MusDB
                            () => { CLI.Line = temp.DirectoryName; });
 
                         Count.flac++;
-                    }
+                    }//!
                     else if (temp.Name.Contains(".mp3"))
                     {
                         CLI.Line = " |  mp3  " + temp.Name;
@@ -85,7 +85,6 @@ namespace MusDB
                     }
                     Count.total++;
                 }
-
             }
             return Files;
         }

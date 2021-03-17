@@ -5,22 +5,22 @@ open System.IO
 open System.Linq
 open System.Collections.Generic
 open System.Security.Cryptography
+open App
+open Config
+open CLI
+
 
 type Files =
-    struct
-        val Name: string
-        val Md5: string
-        val Path: string
-        val Type: string
-    end
+    { Name: string
+      Md5: string
+      Path: string
+      Type: string }
 
-(*type Count =
-    struct
-        val flac: int
-        val mp3: int
-        val etc: int
-        val total: int
-    end*)
+type Count =
+    { mutable Flac: int
+      mutable Mp3: int
+      mutable Etc: int
+      mutable SumAll: int }
 
 type Checker =
     static member ToSHA256 path =
@@ -32,7 +32,81 @@ type Checker =
         |> fun it -> it.ComputeHash file
         |> BitConverter.ToString
 
-    static member CheckAll(config: Config) = 0
+
+
+
+    static member CheckAll(config: Config) : List<Files> =
+        let (path, database) = config.GetConfig
+        let files = new List<Files>()
+
+        let info =
+            (new DirectoryInfo(path)).GetFileSystemInfos()
+
+        let rec checker path count : List<Files> =
+            for el in info do
+                match el with
+                | :? DirectoryInfo as _di ->
+                    files.AddRange(checker path count)
+                    CLI.Line ""
+                | :? FileInfo as fi ->
+                    CLI.Put(count.SumAll.ToString().PadLeft(4, '0'))
+
+                    if fi.Name.Contains(".flac") then
+                        CLI.Line(" | flac  " + fi.Name)
+
+                        let it =
+                            { Name = fi.Name
+                              Md5 = Checker.ToSHA256(fi.FullName)
+                              Path = fi.DirectoryName
+                              Type = "flac" }
+
+                        files.Add it
+
+                        CLI.InPosition
+                            (Console.WindowWidth / 5 * 3)
+                            (Console.CursorTop - 1)
+                            (fun _ -> CLI.Line fi.DirectoryName)
+
+                        count.Flac <- count.Flac + 1
+                    elif fi.Name.Contains(".mp3") then
+                        CLI.Line(" |  mp3  " + fi.Name)
+
+                        let it =
+                            { Name = fi.Name
+                              Md5 = Checker.ToSHA256(fi.FullName)
+                              Path = fi.DirectoryName
+                              Type = "mp3" }
+
+                        files.Add it
+
+                        CLI.InPosition
+                            (Console.WindowWidth / 5 * 3)
+                            (Console.CursorTop - 1)
+                            (fun _ -> CLI.Line fi.DirectoryName)
+
+                        count.Mp3 <- count.Mp3 + 1
+
+                    else
+
+                        CLI.Line fi.Name
+
+                        let it =
+                            { Name = fi.Name
+                              Md5 = ""
+                              Path = fi.DirectoryName
+                              Type = "" }
+
+                        files.Add it
+
+                        count.Etc <- count.Etc + 1
+
+            count.SumAll <- count.SumAll + 1
+
+            files
+
+        files
+
+    //tring Path, ref (int flac, int mp3, int etc, int total) Count
 
     static member CheckOthers(files: List<Files>) =
         [ for el in files do

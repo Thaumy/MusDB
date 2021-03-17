@@ -26,5 +26,5 @@ type Config(configPath) =
 
         (jObject.["path"], jObject.["database"])
         ||> fun path database ->
-                (path, (database.["usr"].ToString(), database.["pwd"].ToString(), database.["db"].ToString()))
+                (path.ToString(), (database.["usr"].ToString(), database.["pwd"].ToString(), database.["db"].ToString()))
         ||> fun path database -> (path, database)
