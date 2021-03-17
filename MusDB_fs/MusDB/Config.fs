@@ -6,7 +6,7 @@ open Newtonsoft.Json.Linq
 
 
 type Config(configPath) =
-    member _this.GetConfig =
+    member this.GetConfig =
         let jsonString =
             try //尝试获取配置文件
                 File.ReadAllText(configPath, Encoding.UTF8)
