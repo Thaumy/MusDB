@@ -1,4 +1,4 @@
-﻿module Checker
+﻿module App.Checker
 
 open System
 open System.IO
@@ -6,52 +6,52 @@ open System.Linq
 open System.Collections.Generic
 open System.Security.Cryptography
 
-
-type Checker =
-    member _this.ToSHA256 path =
-        let sha256 = SHA256.Create()
-
-        let file =
-            new FileStream(path, FileMode.Open, FileAccess.Read)
-
-        BitConverter.ToString(sha256.ComputeHash(file))
-
-type TempStruct =
+type Files =
     struct
         val Name: string
-        val MD5: string
-        val path: string
-        val fileType: string
+        val Md5: string
+        val Path: string
+        val Type: string
     end
 
-type Count =
+(*type Count =
     struct
         val flac: int
         val mp3: int
         val etc: int
         val total: int
-    end
+    end*)
 
+type Checker =
+    static member ToSHA256 path =
 
-let CheckETC (files: List<TempStruct>) =
-    [ for el in files do
-          if el.fileType = "" then el.Name ]
+        let file =
+            new FileStream(path, FileMode.Open, FileAccess.Read)
 
-let CheckConflict (files: List<TempStruct>) =
-    let conflicts =
-        [ for el in files.GroupBy(fun el -> el.MD5) do
-              if el.Count() > 1 then el ]
+        SHA256.Create()
+        |> fun it -> it.ComputeHash file
+        |> BitConverter.ToString
 
-    let result = new List<List<string>>()
+    static member CheckAll(config: Config) = 0
 
-    if conflicts.Any() then
+    static member CheckOthers(files: List<Files>) =
+        [ for el in files do
+              if el.Type = "" then el.Name ]
 
-        for el in conflicts do
-            let it = new List<string>()
+    static member CheckConflict(files: List<Files>) =
+        let conflicts =
+            [ for el in files.GroupBy(fun el -> el.Md5) do
+                  if el.Count() > 1 then el ]
 
-            for foo in el do
-                it.Add(foo.Name)
+        let result = new List<List<string>>()
 
-            result.Add(it)
+        if conflicts.Any() then
+            for el in conflicts do
+                let it = new List<string>()
 
-    result
+                for foo in el do
+                    it.Add foo.Name
+
+                result.Add it
+
+        result

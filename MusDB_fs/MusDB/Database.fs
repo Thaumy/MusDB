@@ -1,4 +1,4 @@
-﻿module Database
+﻿module App.Database
 
 open System
 open System.Collections.Generic
@@ -11,20 +11,19 @@ type Database(user, pwd, database) =
         new MySqlManager(new MySqlConnMsg("localhost", 3306, user, pwd), database)
 
     member this.GetCount =
-        Convert.ToInt32(mySqlManager.GetKey("SELECT COUNT) FROM statistics"))
+        mySqlManager.GetKey "SELECT COUNT(*) FROM statistics"
+        |> Convert.ToInt32
 
     member this.GetAll =
         let result =
-            mySqlManager
-                .GetTable(
-                    "SELECT * FROM statistics"
-                )
-                .Rows
+            mySqlManager.GetTable "SELECT * FROM statistics"
+            |> fun it -> it.Rows
 
         let list = new List<(string * string * string)>()
 
         for row in result do
-            list.Add((row.["Name"].ToString(), row.["MD5"].ToString(), row.["file_type"].ToString()))
+            (row.["Name"].ToString(), row.["MD5"].ToString(), row.["file_type"].ToString())
+            |> list.Add
 
         list
 
@@ -40,10 +39,10 @@ type Database(user, pwd, database) =
                     )
 
                 if mySqlCommand.ExecuteNonQuery() = 1 then
-                    mySqlCommand.Transaction.Commit()
+                    mySqlCommand.Transaction.Commit |> ignore
                     true
                 else
-                    mySqlCommand.Transaction.Rollback()
+                    mySqlCommand.Transaction.Rollback |> ignore
                     false
 
                 )
