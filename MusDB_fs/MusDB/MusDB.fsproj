@@ -6,10 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Config.fs" />
     <Compile Include="CLI.fs" />
     <Compile Include="Checker.fs" />
     <Compile Include="Database.fs" />
-    <Compile Include="Config.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

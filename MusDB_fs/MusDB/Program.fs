@@ -1,8 +1,9 @@
 ﻿open System
+open App
+open Checker
 open Config
 open CLI
 open Database
-
 
 
 CLI.Line "初始化MusDB数据库服务..................[ ]"
@@ -19,4 +20,3 @@ CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Gre
 CLI.Line $"当前数据库记录存留：{result}"
 
 CLI.Pause "按任意键收集数据\n"
-(**)
