@@ -1,14 +1,12 @@
-﻿module Config
+﻿module App.Config
 
 open System.IO
 open System.Text
 open Newtonsoft.Json.Linq
 
 
-type Config() =
+type Config(configPath) =
     member _this.GetConfig =
-        let configPath = "./config.json" //配置文件搜索路径
-
         let jsonString =
             try //尝试获取配置文件
                 File.ReadAllText(configPath, Encoding.UTF8)
@@ -17,19 +15,16 @@ type Config() =
                     new FileStream(configPath, FileMode.Create, FileAccess.Write)
 
                 use streamWriter = new StreamWriter(fileStream)
-                streamWriter.WriteLine("{}")
 
-                streamWriter.Close()
-                fileStream.Close()
+                streamWriter.WriteLine "{}"
+                |> streamWriter.Close
+                |> fileStream.Close
 
                 File.ReadAllText(configPath, Encoding.UTF8)
 
-        let jObject = JObject.Parse(jsonString)
+        let jObject = JObject.Parse jsonString
 
-        let path = jObject.["path"].ToString()
-        let databaseNode = jObject.["database"] //database节点
-
-        let database =
-            (databaseNode.["usr"].ToString(), databaseNode.["pwd"].ToString(), databaseNode.["db"].ToString())
-
-        (path, database)
+        (jObject.["path"], jObject.["database"])
+        ||> fun path database ->
+                (path, (database.["usr"].ToString(), database.["pwd"].ToString(), database.["db"].ToString()))
+        ||> fun path database -> (path, database)

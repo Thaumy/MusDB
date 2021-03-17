@@ -1,4 +1,4 @@
-﻿module CLI
+﻿module App.CLI
 
 open System
 
@@ -6,23 +6,19 @@ open System
 type CLI =
 
     static member InColor color todo : unit =
-        let _d = Console.ForegroundColor = color
+        Console.ForegroundColor <- color
         todo ()
-
-        Console.ForegroundColor = ConsoleColor.White
-        |> ignore
+        Console.ForegroundColor <- ConsoleColor.White
 
 
-    static member InPosition left right todo : unit =
-        Console.SetCursorPosition(left, right)
+    static member InPosition L R todo : unit =
+        Console.SetCursorPosition(L, R)
         todo ()
-
-    static member Pause : unit = Console.ReadLine() |> ignore
 
     static member Pause(text: 'T) : unit =
-        Console.Write(text)
+        Console.Write text
         Console.ReadLine() |> ignore
 
-    static member Line(text: 'T) : unit = Console.WriteLine(text)
+    static member Line(text: 'T) : unit = Console.WriteLine text
 
-    static member Put(text: 'T) : unit = Console.Write(text)
+    static member Put(text: 'T) : unit = Console.Write text
