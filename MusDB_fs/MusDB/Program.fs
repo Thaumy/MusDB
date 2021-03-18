@@ -35,12 +35,12 @@ CLI.Line $"共计:{musicCount}\n"
 CLI.Line "其他项目："
 
 for el in musicFiles do
-    CLI.Line el
+    CLI.Line el.Name
 
 CLI.Line "\n冲突项目：\n"
 
-for el in conflictNames do
-    CLI.Line el
+for name in conflictNames do
+    CLI.Line name
 
 
 CLI.InColor
@@ -52,3 +52,66 @@ CLI.InColor
 let musicInDb = database.GetAll
 
 CLI.Line "以下项目在本地文件中不存在："
+
+
+CLI.Line "以下项目在本地文件中不存在："
+
+let musicOnlyInDb = List<File>()
+
+for el in musicInDb do
+    let isExist =
+        let mutable exist = false
+
+        for it in musicFiles do
+            if el.Name = it.Name
+               && el.Type = it.Type
+               && el.Sha256 = it.Sha256 then
+                exist <- true
+            else
+                ()
+
+        exist
+
+    if isExist = false then
+        musicOnlyInDb.Add el
+
+for el in musicOnlyInDb do
+    CLI.Line el.Name
+
+CLI.Line "以下项目在本地文件中不存在："
+
+let musicOnlyInLocal = List<File>()
+
+for el in musicFiles do
+    let isExist =
+        let mutable exist = false
+
+        for it in musicInDb do
+            if el.Name = it.Name
+               && el.Type = it.Type
+               && el.Sha256 = it.Sha256 then
+                exist <- true
+            else
+                ()
+
+        exist
+
+    if isExist = false then
+        musicOnlyInLocal.Add el
+
+for el in musicOnlyInLocal do
+    CLI.Line el.Name
+
+
+CLI.InColor
+    ConsoleColor.Green
+    (fun _ ->
+        CLI.Pause "\n按任意键将本地新增数据添加到数据库。"
+        CLI.Line "\n")
+
+
+for el in musicOnlyInLocal do
+    database.Add el |> ignore
+
+
+CLI.InColor ConsoleColor.Green (fun _ -> CLI.Pause("\n\a任务完成，任意键退出。"))

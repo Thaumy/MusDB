@@ -4,6 +4,10 @@ open System
 open System.Collections.Generic
 open WaterLibrary.MySql
 open MySql.Data.MySqlClient
+open App
+open Checker
+
+open type File
 
 
 type Database(user, pwd, database) =
@@ -11,7 +15,7 @@ type Database(user, pwd, database) =
         new MySqlManager(new MySqlConnMsg("localhost", 3306, user, pwd), database)
 
     member this.GetCount =
-        mySqlManager.GetKey "SELECT COUNT(*) FROM statistics"
+        mySqlManager.GetKey "SELECT COUNT) FROM statistics"
         |> Convert.ToInt32
 
     member this.GetAll =
@@ -19,21 +23,26 @@ type Database(user, pwd, database) =
             mySqlManager.GetTable "SELECT * FROM statistics"
             |> fun it -> it.Rows
 
-        let list = new List<(string * string * string)>()
+        let files = new List<File>()
+
 
         for row in result do
-            (row.["Name"].ToString(), row.["MD5"].ToString(), row.["file_type"].ToString())
-            |> list.Add
+            { Name = row.["Name"].ToString()
+              Path = ""
+              Type = row.["file_type"].ToString()
+              Sha256 = row.["MD5"].ToString() }
+            |> files.Add
 
-        list
+        files
 
-    member this.Update name md5 fileType =
+    member this.Add file =
         mySqlManager.DoInConnection
             (fun conn ->
                 let mySqlCommand =
                     new MySqlCommand(
                         CommandText =
-                            $"INSERT INTO statistics (name,md5,file_type) VALUES (\"{name}\",\"{md5}\",\"{fileType}\");",
+                            "INSERT INTO statistics (name,md5,file_type) VALUES "
+                            + $"(\"{file.Name}\",\"{file.Sha256}\",\"{file.Type}\");",
                         Connection = conn,
                         Transaction = conn.BeginTransaction()
                     )
@@ -43,6 +52,4 @@ type Database(user, pwd, database) =
                     true
                 else
                     mySqlCommand.Transaction.Rollback |> ignore
-                    false
-
-                )
+                    false)
