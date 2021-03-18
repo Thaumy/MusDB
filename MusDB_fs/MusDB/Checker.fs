@@ -129,3 +129,6 @@ type Checker =
 
         [ for el in conflicts do
               for it in el -> it.Name ]
+
+    static member NoExistInDB()=
+        
