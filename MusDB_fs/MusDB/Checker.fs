@@ -10,7 +10,7 @@ open CLI
 open Config
 
 
-type Files =
+type File =
     { Name: string
       Path: string
       Type: string
@@ -35,7 +35,7 @@ type Checker =
     static member CheckAll musicPath =
 
         let rec checker path =
-            let files = new List<Files>()
+            let files = new List<File>()
 
             let count =
                 { Mp3 = 0
@@ -46,9 +46,9 @@ type Checker =
             for el in (new DirectoryInfo(path)).GetFileSystemInfos() do
                 match el with
                 | :? DirectoryInfo as di ->
-                    let (childFiles, childCount) = checker di.FullName
+                    let (childFile, childCount) = checker di.FullName
 
-                    files.AddRange(childFiles)
+                    files.AddRange(childFile)
                     count.Mp3 <- count.Mp3 + childCount.Mp3
                     count.Flac <- count.Flac + childCount.Flac
                     count.Others <- count.Others + childCount.Others
@@ -108,27 +108,24 @@ type Checker =
 
         checker musicPath
 
-    static member CheckMusic(files: List<Files>) =
-        let musicFiles =
+    static member CheckMusic(files: List<File>) =
+        let musicFile =
             [ for el in files do
-                  if el.Type <> "" then el.Name ]
+                  if el.Type <> "" then el ]
 
-        (musicFiles, musicFiles.Length)
+        (musicFile, musicFile.Length)
 
-    static member CheckOthers(files: List<Files>) =
-        let otherFiles =
+    static member CheckOthers(files: List<File>) =
+        let otherFile =
             [ for el in files do
-                  if el.Type = "" then el.Name ]
+                  if el.Type = "" then el ]
 
-        (otherFiles, otherFiles.Length)
+        (otherFile, otherFile.Length)
 
-    static member ConflictNames(files: List<Files>) =
+    static member ConflictNames(files: List<File>) =
         let conflicts =
             [ for el in files.GroupBy(fun el -> el.Sha256) do
                   if el.Count() > 1 then el ]
 
         [ for el in conflicts do
               for it in el -> it.Name ]
-
-    static member NoExistInDB()=
-        
