@@ -15,10 +15,15 @@ type CLI =
         Console.SetCursorPosition(L, R)
         todo ()
 
-    static member Pause(text: 'T) : unit =
+    static member InRight(text: string) : unit =
+        Console.SetCursorPosition(Console.WindowWidth - text.Length, Console.CursorTop - 1)
         Console.Write text
-        Console.ReadLine() |> ignore
 
-    static member Line(text: 'T) : unit = Console.WriteLine text
+    static member Pause(text: 'T) =
+        Console.Write text
+        Console.ReadLine()
+
 
     static member Put(text: 'T) : unit = Console.Write text
+
+    static member Line(text: 'T) : unit = Console.WriteLine text

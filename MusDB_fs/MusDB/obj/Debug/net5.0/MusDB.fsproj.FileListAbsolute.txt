@@ -49,3 +49,4 @@ C:\Users\Thaumy\Desktop\GitHub\MusDB\MusDB_fs\MusDB\obj\Debug\net5.0\MusDB.fspro
 C:\Users\Thaumy\Desktop\GitHub\MusDB\MusDB_fs\MusDB\obj\Debug\net5.0\MusDB.dll
 C:\Users\Thaumy\Desktop\GitHub\MusDB\MusDB_fs\MusDB\obj\Debug\net5.0\MusDB.pdb
 C:\Users\Thaumy\Desktop\GitHub\MusDB\MusDB_fs\MusDB\obj\Debug\net5.0\MusDB.genruntimeconfig.cache
+C:\Users\Thaumy\Desktop\GitHub\MusDB\MusDB_fs\MusDB\bin\Debug\net5.0\.XML
