@@ -5,9 +5,13 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>\.XML</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="Config.fs" />
     <Compile Include="CLI.fs" />
+    <Compile Include="Config.fs" />
     <Compile Include="Checker.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Program.fs" />

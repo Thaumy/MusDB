@@ -7,7 +7,6 @@ open System.Collections.Generic
 open System.Security.Cryptography
 open App
 open CLI
-open Config
 
 
 type File =
@@ -32,9 +31,10 @@ type Checker =
         |> fun it -> it.ComputeHash file
         |> BitConverter.ToString
 
-    static member CheckAll musicPath =
+    static member CheckAll musicPath todo =
 
-        let rec checker path =
+        let rec checker path todo =
+
             let files = new List<File>()
 
             let count =
@@ -46,7 +46,8 @@ type Checker =
             for el in (new DirectoryInfo(path)).GetFileSystemInfos() do
                 match el with
                 | :? DirectoryInfo as di ->
-                    let (childFile, childCount) = checker di.FullName
+
+                    let (childFile, childCount) = checker di.FullName todo
 
                     files.AddRange(childFile)
                     count.Mp3 <- count.Mp3 + childCount.Mp3
@@ -54,12 +55,13 @@ type Checker =
                     count.Others <- count.Others + childCount.Others
                     count.SumAll <- count.SumAll + childCount.SumAll
 
-                    CLI.Line ""
                 | :? FileInfo as fi ->
-                    CLI.Put(count.SumAll.ToString().PadLeft(4, '0'))
 
-                    if fi.Name.Contains(".flac") then
-                        CLI.Line(" | flac  " + fi.Name)
+                    if fi.Name.Contains ".flac" then
+                        todo ()
+                        CLI.Put " |"
+                        CLI.InColor ConsoleColor.Cyan (fun _ -> CLI.Put " FLAC  ")
+                        CLI.Line fi.Name
 
                         { Name = fi.Name
                           Sha256 = Checker.ToSha256(fi.FullName)
@@ -69,13 +71,15 @@ type Checker =
 
                         count.Flac <- count.Flac + 1
 
-                        CLI.InPosition
-                            (Console.WindowWidth / 5 * 3)
+                        (*CLI.InPosition
+                            (Console.WindowWidth - fi.DirectoryName.Length - 8)
                             (Console.CursorTop - 1)
-                            (fun _ -> CLI.Line fi.DirectoryName)
+                            (fun _ -> CLI.Line fi.DirectoryName)*)
+                        CLI.InRight fi.DirectoryName
 
-                    elif fi.Name.Contains(".mp3") then
-                        CLI.Line(" |  mp3  " + fi.Name)
+                    elif fi.Name.Contains ".mp3" then
+                        todo ()
+                        CLI.Line(" |  MP3  " + fi.Name)
 
                         { Name = fi.Name
                           Sha256 = Checker.ToSha256(fi.FullName)
@@ -85,14 +89,12 @@ type Checker =
 
                         count.Mp3 <- count.Mp3 + 1
 
-                        CLI.InPosition
-                            (Console.WindowWidth / 5 * 3)
+                    (*CLI.InPosition
+                            (Console.WindowWidth - fi.DirectoryName.Length - 8)
                             (Console.CursorTop - 1)
-                            (fun _ -> CLI.Line fi.DirectoryName)
+                            (fun _ -> CLI.Line fi.DirectoryName)*)
 
                     else
-                        CLI.Line fi.Name
-
                         { Name = fi.Name
                           Sha256 = ""
                           Path = fi.DirectoryName
@@ -104,14 +106,16 @@ type Checker =
                     count.SumAll <- count.SumAll + 1
                 | _ -> ()
 
+            CLI.Line ""
             (files, count)
 
-        checker musicPath
+        checker musicPath todo
 
     static member CheckMusic(files: List<File>) =
         let musicFile =
             [ for el in files do
                   if el.Type <> "" then el ]
+
 
         (musicFile, musicFile.Length)
 
@@ -122,10 +126,24 @@ type Checker =
 
         (otherFile, otherFile.Length)
 
-    static member ConflictNames(files: List<File>) =
-        let conflicts =
-            [ for el in files.GroupBy(fun el -> el.Sha256) do
-                  if el.Count() > 1 then el ]
+    static member CheckConflicts(files: List<File>) =
+        [ for el in files.GroupBy(fun el -> el.Sha256) do
+              if el.Count() > 1 then
+                  for it in el -> it ]
 
-        [ for el in conflicts do
-              for it in el -> it.Name ]
+    static member LeftOnly L R =
+        [ for el in L do
+              let exist =
+                  let mutable found = false
+
+                  for it in R do
+                      if el.Name = it.Name
+                         && el.Type = it.Type
+                         && el.Sha256 = it.Sha256 then
+                          found <- true
+                      else
+                          ()
+
+                  found
+
+              if not exist then el ]

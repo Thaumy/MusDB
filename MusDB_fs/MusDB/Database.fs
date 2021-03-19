@@ -7,15 +7,13 @@ open MySql.Data.MySqlClient
 open App
 open Checker
 
-open type File
-
 
 type Database(user, pwd, database) =
     let mySqlManager =
         new MySqlManager(new MySqlConnMsg("localhost", 3306, user, pwd), database)
 
     member this.GetCount =
-        mySqlManager.GetKey "SELECT COUNT) FROM statistics"
+        mySqlManager.GetKey "SELECT COUNT(*) FROM statistics"
         |> Convert.ToInt32
 
     member this.GetAll =
@@ -27,10 +25,10 @@ type Database(user, pwd, database) =
 
 
         for row in result do
-            { Name = row.["Name"].ToString()
+            { Name = row.["name"].ToString()
               Path = ""
-              Type = row.["file_type"].ToString()
-              Sha256 = row.["MD5"].ToString() }
+              Type = row.["type"].ToString()
+              Sha256 = row.["sha256"].ToString() }
             |> files.Add
 
         files
@@ -41,15 +39,15 @@ type Database(user, pwd, database) =
                 let mySqlCommand =
                     new MySqlCommand(
                         CommandText =
-                            "INSERT INTO statistics (name,md5,file_type) VALUES "
-                            + $"(\"{file.Name}\",\"{file.Sha256}\",\"{file.Type}\");",
+                            "INSERT INTO statistics (name,type,sha256) VALUES "
+                            + $"('{file.Name}','{file.Type}','{file.Sha256}');",
                         Connection = conn,
                         Transaction = conn.BeginTransaction()
                     )
 
                 if mySqlCommand.ExecuteNonQuery() = 1 then
-                    mySqlCommand.Transaction.Commit |> ignore
+                    mySqlCommand.Transaction.Commit()
                     true
                 else
-                    mySqlCommand.Transaction.Rollback |> ignore
+                    mySqlCommand.Transaction.Rollback()
                     false)
