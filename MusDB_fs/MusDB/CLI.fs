@@ -1,7 +1,7 @@
 ﻿module App.CLI
 
 open System
-
+open System.Text
 
 type CLI =
 
@@ -16,7 +16,12 @@ type CLI =
         todo ()
 
     static member InRight(text: string) : unit =
-        Console.SetCursorPosition(Console.WindowWidth - text.Length, Console.CursorTop - 1)
+        Console.SetCursorPosition(
+            Console.WindowWidth
+            - Encoding.Default.GetByteCount(text),
+            Console.CursorTop
+        )
+
         Console.Write text
 
     static member Pause(text: 'T) =

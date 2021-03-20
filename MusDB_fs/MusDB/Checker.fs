@@ -61,7 +61,7 @@ type Checker =
                         todo ()
                         CLI.Put " |"
                         CLI.InColor ConsoleColor.Cyan (fun _ -> CLI.Put " FLAC  ")
-                        CLI.Line fi.Name
+                        CLI.Put fi.Name
 
                         { Name = fi.Name
                           Sha256 = Checker.ToSha256(fi.FullName)
@@ -71,15 +71,11 @@ type Checker =
 
                         count.Flac <- count.Flac + 1
 
-                        (*CLI.InPosition
-                            (Console.WindowWidth - fi.DirectoryName.Length - 8)
-                            (Console.CursorTop - 1)
-                            (fun _ -> CLI.Line fi.DirectoryName)*)
-                        CLI.InRight fi.DirectoryName
-
+                        CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight fi.DirectoryName)
+                        CLI.Line ""
                     elif fi.Name.Contains ".mp3" then
                         todo ()
-                        CLI.Line(" |  MP3  " + fi.Name)
+                        CLI.Put(" |  MP3  " + fi.Name)
 
                         { Name = fi.Name
                           Sha256 = Checker.ToSha256(fi.FullName)
@@ -89,11 +85,8 @@ type Checker =
 
                         count.Mp3 <- count.Mp3 + 1
 
-                    (*CLI.InPosition
-                            (Console.WindowWidth - fi.DirectoryName.Length - 8)
-                            (Console.CursorTop - 1)
-                            (fun _ -> CLI.Line fi.DirectoryName)*)
-
+                        CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight fi.DirectoryName)
+                        CLI.Line ""
                     else
                         { Name = fi.Name
                           Sha256 = ""

@@ -52,7 +52,8 @@ for el in conflictFiles do
 CLI.InColor
     ConsoleColor.Green
     (fun _ ->
-        CLI.Pause "\n\a检查完成，按任意键匹配数据" |> ignore
+        CLI.Line ""
+        CLI.Pause "检查完成，按任意键匹配数据" |> ignore
         CLI.Line "")
 
 let musicInDb = database.GetAll
