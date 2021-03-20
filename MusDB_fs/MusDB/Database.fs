@@ -40,7 +40,7 @@ type Database(user, pwd, database) =
                     new MySqlCommand(
                         CommandText =
                             "INSERT INTO statistics (name,type,sha256) VALUES "
-                            + $"('{file.Name}','{file.Type}','{file.Sha256}');",
+                            + $"""("{file.Name}","{file.Type}","{file.Sha256}");""",
                         Connection = conn,
                         Transaction = conn.BeginTransaction()
                     )
