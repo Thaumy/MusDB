@@ -109,7 +109,6 @@ type Checker =
             [ for el in files do
                   if el.Type <> "" then el ]
 
-
         (musicFile, musicFile.Length)
 
     static member CheckOthers(files: List<File>) =
@@ -124,25 +123,22 @@ type Checker =
               if el.Count() > 1 then
                   for it in el -> it ]
 
+    static member Find it dest =
+        match dest with
+        | head :: tail ->
+            if it.Name = head.Name
+               && it.Type = head.Type
+               && it.Sha256 = head.Sha256 then
+                true
+            else
+                Checker.Find it tail
+        | [] -> false
+
     static member LeftOnly L R =
-        let rec exist it list =
-            match list with
-            | head :: tail ->
-                if it.Name = head.Name
-                   && it.Type = head.Type
-                   && it.Sha256 = head.Sha256 then
-                    true
-                else
-                    exist it tail
-            | [] -> false
-
-        let rec loop list R=
-            [ match list with
-              | head :: tail ->
-                  if not (exist head R) then
-                      yield head
-                  else
-                      yield! loop tail R
-              | [] -> yield! [] ]
-
-        loop L R
+        [ match L with
+          | head :: tail ->
+              if not (Checker.Find head R) then
+                  yield head
+              else
+                  yield! Checker.LeftOnly tail R
+          | [] -> yield! [] ]
