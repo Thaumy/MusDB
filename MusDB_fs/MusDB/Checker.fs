@@ -125,18 +125,24 @@ type Checker =
                   for it in el -> it ]
 
     static member LeftOnly L R =
-        [ for el in L do
-              let exist =
-                  let mutable found = false
+        let rec exist it list =
+            match list with
+            | head :: tail ->
+                if it.Name = head.Name
+                   && it.Type = head.Type
+                   && it.Sha256 = head.Sha256 then
+                    true
+                else
+                    exist it tail
+            | [] -> false
 
-                  for it in R do
-                      if el.Name = it.Name
-                         && el.Type = it.Type
-                         && el.Sha256 = it.Sha256 then
-                          found <- true
-                      else
-                          ()
+        let rec loop list R=
+            [ match list with
+              | head :: tail ->
+                  if not (exist head R) then
+                      yield head
+                  else
+                      yield! loop tail R
+              | [] -> yield! [] ]
 
-                  found
-
-              if not exist then el ]
+        loop L R

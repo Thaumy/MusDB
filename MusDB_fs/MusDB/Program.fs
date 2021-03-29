@@ -56,7 +56,7 @@ CLI.InColor
         CLI.Pause "检查完成，按任意键匹配数据" |> ignore
         CLI.Line "")
 
-let musicInDb = database.GetAll
+let musicInDb:list<File> = database.GetAll
 
 CLI.Line "以下项目仅在数据库存在 :"
 
