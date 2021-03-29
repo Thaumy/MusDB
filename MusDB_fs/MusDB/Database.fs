@@ -21,17 +21,11 @@ type Database(user, pwd, database) =
             mySqlManager.GetTable "SELECT * FROM statistics"
             |> fun it -> it.Rows
 
-        let files = new List<File>()
-
-
-        for row in result do
-            { Name = row.["name"].ToString()
-              Path = ""
-              Type = row.["type"].ToString()
-              Sha256 = row.["sha256"].ToString() }
-            |> files.Add
-
-        files
+        [ for row in result do
+              { Name = row.["name"].ToString()
+                Path = ""
+                Type = row.["type"].ToString()
+                Sha256 = row.["sha256"].ToString() } ]
 
     member this.Add file =
         mySqlManager.DoInConnection
