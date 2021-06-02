@@ -7,7 +7,11 @@ open Database
 
 
 CLI.Line "查找配置文件信息 ......................[    ]"
-let (musicPath, databaseConfig) = Config("./config.json").GetConfig
+
+let currPath =
+    $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
+
+let (musicPath, databaseConfig) = Config(currPath).GetConfig
 CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
 
 CLI.Line "联络到数据库 ..........................[    ]"
