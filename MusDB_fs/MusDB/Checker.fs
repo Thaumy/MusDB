@@ -23,7 +23,7 @@ type Checker =
         | x :: xs -> 
             match x with
             | :? DirectoryInfo as di ->
-                Checker.GetAllFiles(Checker.GetFileSystemInfosList di.FullName)
+                Checker.GetAllFiles(Checker.GetFileSystemInfosList di.FullName) @ Checker.GetAllFiles xs
             | :? FileInfo      as fi -> 
                 match true with
                 | _ when fi.Name.Contains ".flac" ->
@@ -43,9 +43,6 @@ type Checker =
                       Type = "" } :: Checker.GetAllFiles xs
             | _  ->[]
         | [] -> []
-
-    static member GetMusicFiles files = filter (fun x -> x.Type <> "") files
-    static member GetOtherFiles files = filter (fun x -> x.Type = "") files
 
     static member CheckConflicts(files: File list) =
         [ for el in files.GroupBy(fun el -> el.Sha256) do
