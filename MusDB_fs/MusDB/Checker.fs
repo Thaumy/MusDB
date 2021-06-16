@@ -6,30 +6,17 @@ open System.Linq
 open System.Collections.Generic
 open System.Security.Cryptography
 open App
+open Util
+open Mod
 open CLI
 
-
-type File =
-    { Name: string
-      Path: string
-      Type: string
-      Sha256: string }
-
-type Count =
-    { mutable Flac: int
-      mutable Mp3: int
-      mutable Others: int
-      mutable SumAll: int }
 
 type Checker =
     static member ToSha256 path =
 
-        let file =
-            new FileStream(path, FileMode.Open, FileAccess.Read)
+        let file = new FileStream(path, FileMode.Open, FileAccess.Read)
 
-        SHA256.Create()
-        |> fun it -> it.ComputeHash file
-        |> BitConverter.ToString
+        SHA256.Create() |> fun it -> it.ComputeHash file |> BitConverter.ToString
 
     static member CheckAll musicPath todo =
 
@@ -37,11 +24,7 @@ type Checker =
 
             let files = new List<File>()
 
-            let count =
-                { Mp3 = 0
-                  Flac = 0
-                  Others = 0
-                  SumAll = 0 }
+            let count = { Mp3 = 0; Flac = 0; Others = 0; SumAll = 0 }
 
             for el in (new DirectoryInfo(path)).GetFileSystemInfos() do
                 match el with
@@ -88,11 +71,7 @@ type Checker =
                         CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight fi.DirectoryName)
                         CLI.Line ""
                     else
-                        { Name = fi.Name
-                          Sha256 = ""
-                          Path = fi.DirectoryName
-                          Type = "" }
-                        |> files.Add
+                        { Name = fi.Name; Sha256 = ""; Path = fi.DirectoryName; Type = "" } |> files.Add
 
                         count.Others <- count.Others + 1
 
@@ -104,41 +83,37 @@ type Checker =
 
         checker musicPath todo
 
-    static member CheckMusic(files: List<File>) =
-        let musicFile =
-            [ for el in files do
-                  if el.Type <> "" then el ]
+    static member GetFileSystemInfosList path = map id [ for x in (new DirectoryInfo(path)).GetFileSystemInfos() do x ]
 
-        (musicFile, musicFile.Length)
+    static member GetAllFiles (list:FileSystemInfo list) =
+        match list with
+        | x :: xs -> 
+            match x with
+            | :? DirectoryInfo as di ->
+                Checker.GetAllFiles(Checker.GetFileSystemInfosList di.FullName)
+            | :? FileInfo      as fi -> 
+                match true with
+                | _ when fi.Name.Contains ".flac" ->
+                    { Name = fi.Name
+                      Sha256 = Checker.ToSha256(fi.FullName)
+                      Path = fi.DirectoryName
+                      Type = "flac" } :: Checker.GetAllFiles xs
+                | _ when fi.Name.Contains ".mp3"  ->
+                    { Name = fi.Name
+                      Sha256 = Checker.ToSha256(fi.FullName)
+                      Path = fi.DirectoryName
+                      Type = "mp3" } :: Checker.GetAllFiles xs
+                | _  ->
+                    { Name = fi.Name
+                      Sha256 = Checker.ToSha256(fi.FullName)
+                      Path = fi.DirectoryName
+                      Type = "" } :: Checker.GetAllFiles xs
+            | _  ->[]
+        | [] -> []
 
-    static member CheckOthers(files: List<File>) =
-        let otherFile =
-            [ for el in files do
-                  if el.Type = "" then el ]
+    static member GetMusicFiles files = filter (fun x -> x.Type <> "") files
+    static member GetOtherFiles files = filter (fun x -> x.Type = "") files
 
-        (otherFile, otherFile.Length)
-
-    static member CheckConflicts(files: List<File>) =
+    static member CheckConflicts(files: File list) =
         [ for el in files.GroupBy(fun el -> el.Sha256) do
-              if el.Count() > 1 then
-                  for it in el -> it ]
-
-    static member Find it dest =
-        match dest with
-        | head :: tail ->
-            if it.Name = head.Name
-               && it.Type = head.Type
-               && it.Sha256 = head.Sha256 then
-                true
-            else
-                Checker.Find it tail
-        | [] -> false
-
-    static member LeftOnly L R =
-        [ match L with
-          | head :: tail ->
-              if not (Checker.Find head R) then
-                  yield head
-              else
-                  yield! Checker.LeftOnly tail R
-          | [] -> yield! [] ]
+              if el.Count() > 1 then for it in el -> it ]

@@ -12,6 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Util.fs" />
+    <Compile Include="Mod.fs" />
     <Compile Include="CLI.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="Checker.fs" />
