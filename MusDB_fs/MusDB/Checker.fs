@@ -13,75 +13,8 @@ open CLI
 
 type Checker =
     static member ToSha256 path =
-
         let file = new FileStream(path, FileMode.Open, FileAccess.Read)
-
         SHA256.Create() |> fun it -> it.ComputeHash file |> BitConverter.ToString
-
-    static member CheckAll musicPath todo =
-
-        let rec checker path todo =
-
-            let files = new List<File>()
-
-            let count = { Mp3 = 0; Flac = 0; Others = 0; SumAll = 0 }
-
-            for el in (new DirectoryInfo(path)).GetFileSystemInfos() do
-                match el with
-                | :? DirectoryInfo as di ->
-
-                    let (childFile, childCount) = checker di.FullName todo
-
-                    files.AddRange(childFile)
-                    count.Mp3 <- count.Mp3 + childCount.Mp3
-                    count.Flac <- count.Flac + childCount.Flac
-                    count.Others <- count.Others + childCount.Others
-                    count.SumAll <- count.SumAll + childCount.SumAll
-
-                | :? FileInfo as fi ->
-
-                    if fi.Name.Contains ".flac" then
-                        todo ()
-                        CLI.Put " |"
-                        CLI.InColor ConsoleColor.Cyan (fun _ -> CLI.Put " FLAC  ")
-                        CLI.Put fi.Name
-
-                        { Name = fi.Name
-                          Sha256 = Checker.ToSha256(fi.FullName)
-                          Path = fi.DirectoryName
-                          Type = "flac" }
-                        |> files.Add
-
-                        count.Flac <- count.Flac + 1
-
-                        CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight fi.DirectoryName)
-                        CLI.Line ""
-                    elif fi.Name.Contains ".mp3" then
-                        todo ()
-                        CLI.Put(" |  MP3  " + fi.Name)
-
-                        { Name = fi.Name
-                          Sha256 = Checker.ToSha256(fi.FullName)
-                          Path = fi.DirectoryName
-                          Type = "mp3" }
-                        |> files.Add
-
-                        count.Mp3 <- count.Mp3 + 1
-
-                        CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight fi.DirectoryName)
-                        CLI.Line ""
-                    else
-                        { Name = fi.Name; Sha256 = ""; Path = fi.DirectoryName; Type = "" } |> files.Add
-
-                        count.Others <- count.Others + 1
-
-                    count.SumAll <- count.SumAll + 1
-                | _ -> ()
-
-            CLI.Line ""
-            (files, count)
-
-        checker musicPath todo
 
     static member GetFileSystemInfosList path = map id [ for x in (new DirectoryInfo(path)).GetFileSystemInfos() do x ]
 

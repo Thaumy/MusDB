@@ -7,13 +7,13 @@ type CLI =
 
     static member InColor color todo : unit =
         Console.ForegroundColor <- color
-        todo ()
+        todo
         Console.ForegroundColor <- ConsoleColor.White
 
 
     static member InPosition L R todo : unit =
         Console.SetCursorPosition(L, R)
-        todo ()
+        todo
 
     static member InRight(text: string) : unit =
         Console.SetCursorPosition(

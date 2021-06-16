@@ -15,28 +15,19 @@ let currPath =
 
 let (musicPath, databaseConfig) = getConfig currPath
 
-CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+CLI.InPosition 40 (Console.CursorTop - 1) (CLI.InColor ConsoleColor.Green (CLI.Line "DONE"))
 
 CLI.Line "联络到数据库 ..........................[    ]"
 let database = Database(databaseConfig)
-CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+CLI.InPosition 40 (Console.CursorTop - 1) (CLI.InColor ConsoleColor.Green (CLI.Line "DONE"))
 
 CLI.Line $"\n当前数据库记录存留 : {database.GetCount}"
 
 
 let _ =
     CLI.Put "Press "
-    CLI.InColor ConsoleColor.Green (fun _ -> CLI.Put "ENTER")
+    CLI.InColor ConsoleColor.Green (CLI.Put "ENTER")
     CLI.Pause " to collect data\n"
-
-let mutable index = 1
-
-(*let (allFiles, allCount) =
-    Checker.CheckAll
-        musicPath
-        (fun _ ->
-            CLI.Put(index.ToString().PadLeft(4, ' '))
-            index <- index + 1)*)
 
 let allInfoList = Checker.GetFileSystemInfosList musicPath
 let allFiles = Checker.GetAllFiles allInfoList
@@ -51,7 +42,7 @@ let flacFiles = filter (fun x -> x.Type = "flac") musicFiles
 let mp3Files = filter (fun x -> x.Type = "mp3") musicFiles
 
 let conflictFiles = Checker.CheckConflicts allFiles
-CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+CLI.InPosition 40 (Console.CursorTop - 1) (CLI.InColor ConsoleColor.Green (CLI.Line "DONE"))
 
 CLI.Line $"\n共计 : {musicCount}    FLAC : {flacFiles.Length}    MP3 : {mp3Files.Length}\n"
 
@@ -65,12 +56,7 @@ CLI.Line "冲突项目 :"
 for el in conflictFiles do
     CLI.Line el.Name
 
-CLI.InColor
-    ConsoleColor.Green
-    (fun _ ->
-        CLI.Line ""
-        CLI.Pause "检查完成，按任意键匹配数据" |> ignore
-        CLI.Line "")
+CLI.InColor ConsoleColor.Green (CLI.Pause "检查完成，按任意键匹配数据\n" |> ignore)
 
 let musicInDb = database.GetAll
 
@@ -83,19 +69,14 @@ let _ =
     map (fun x -> CLI.Line x.Name) (leftOnly musicFiles musicInDb)
 
 
-CLI.InColor ConsoleColor.Green (fun _ -> CLI.Pause "\n按任意键将新增数据录入数据库\n" |> ignore)
+CLI.InColor ConsoleColor.Green (CLI.Pause "\n按任意键将新增数据录入数据库\n" |> ignore)
 
-for el in leftOnly musicFiles musicInDb do
-    let success = database.Add el
+let _ = map (fun x ->
+    let isSuccess = database.Add x
+    CLI.InColor 
+        (if isSuccess then ConsoleColor.Green else ConsoleColor.Red) 
+        (CLI.Put (if isSuccess then "Added : " else "Failed: "))
 
-    let (color, text) =
-        if success then
-            (ConsoleColor.Green, "Added : ")
-        else
-            (ConsoleColor.Red, "Failed: ")
+    CLI.Line $"{x.Name}") (leftOnly musicFiles musicInDb)
 
-    CLI.InColor color (fun _ -> CLI.Put text)
-    CLI.Line $"{el.Name}"
-
-CLI.Line ""
-CLI.InColor ConsoleColor.Green (fun _ -> CLI.Pause "任务完成，任意键退出。" |> ignore)
+CLI.InColor ConsoleColor.Green (CLI.Pause "任务完成，任意键退出。" |> ignore)
