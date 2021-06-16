@@ -1,10 +1,11 @@
 ﻿module App.Database
 
 open System
-open System.Collections.Generic
 open WaterLibrary.MySql
 open MySql.Data.MySqlClient
 open App
+open Mod
+open Util
 open Checker
 
 
@@ -18,14 +19,17 @@ type Database(user, pwd, database) =
 
     member this.GetAll =
         let result =
-            mySqlManager.GetTable "SELECT * FROM statistics"
-            |> fun it -> it.Rows
+            [ for el in (mySqlManager.GetTable "SELECT * FROM statistics")
+                  .Rows do
+                  el ]
 
-        [ for row in result do
-              { Name = row.["name"].ToString()
-                Path = ""
-                Type = row.["type"].ToString()
-                Sha256 = row.["sha256"].ToString() } ]
+        let f (row: Data.DataRow) =
+            { Name = row.["name"].ToString()
+              Path = ""
+              Type = row.["type"].ToString()
+              Sha256 = row.["sha256"].ToString() }
+
+        map f result
 
     member this.Add file =
         mySqlManager.DoInConnection
