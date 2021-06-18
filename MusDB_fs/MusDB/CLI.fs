@@ -32,3 +32,5 @@ type CLI =
     static member Put(text: 'T) : unit = Console.Write text
 
     static member Line(text: 'T) : unit = Console.WriteLine text
+
+    static member newLine : unit = Console.WriteLine ""

@@ -10,6 +10,14 @@ open Util
 open Mod
 open CLI
 
+ let showMusic musicName isFlac musicPath =
+    let (text,color)=if isFlac then ("FLAC",ConsoleColor.Cyan) else ("MP3 ",ConsoleColor.White)
+    CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.Put "|")
+    CLI.InColor color (fun _ -> CLI.Put $" {text} ")
+    CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.Put "|")
+    CLI.Put $"{musicName}"
+    CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight musicPath)
+    CLI.newLine
 
 type Checker =
     static member ToSha256 path =
@@ -27,11 +35,13 @@ type Checker =
             | :? FileInfo      as fi -> 
                 match true with
                 | _ when fi.Name.Contains ".flac" ->
+                    showMusic fi.Name true fi.DirectoryName
                     { Name = fi.Name
                       Sha256 = Checker.ToSha256(fi.FullName)
                       Path = fi.DirectoryName
                       Type = "flac" } :: Checker.GetAllFiles xs
                 | _ when fi.Name.Contains ".mp3"  ->
+                    showMusic fi.Name false fi.DirectoryName
                     { Name = fi.Name
                       Sha256 = Checker.ToSha256(fi.FullName)
                       Path = fi.DirectoryName
