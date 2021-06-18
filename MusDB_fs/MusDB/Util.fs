@@ -15,9 +15,29 @@ let rec filter p list =
             filter p xs
     | [] -> []
 
-let rec elem it list =
+let rec foldl f list acc =
     match list with
-    | x :: xs -> if it = x then true else elem it xs
-    | [] -> false
+    | x :: xs -> foldl f xs (f acc x) 
+    | [] -> acc
 
-let leftOnly l r = filter (fun x -> not (elem x r)) l
+let rec foldr f list acc =
+    match list with
+    | x :: xs -> f x (foldr f xs acc)
+    | [] -> acc
+
+let rec concat list = 
+    match list with
+    | x :: xs  ->  x @ concat xs
+    | [] -> []
+
+let rec sames p list = 
+    match list with
+    | x :: xs -> 
+        match filter (fun y -> p y x) xs with
+        | [] -> sames p xs
+        | ys -> (x :: ys) :: sames p ( filter (fun z -> z <> x) xs )
+    | [] -> []
+
+let elem p x list = foldl (fun acc y -> p y x || acc ) list false 
+
+let leftOnly p l r = filter (fun x -> not (elem p x r)) l

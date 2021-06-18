@@ -25,9 +25,9 @@ type Database(user, pwd, database) =
 
         let f (row: Data.DataRow) =
             { Name = row.["name"].ToString()
-              Path = ""
               Type = row.["type"].ToString()
-              Sha256 = row.["sha256"].ToString() }
+              Sha256 = row.["sha256"].ToString() 
+              Path = "" }
 
         map f result
 
