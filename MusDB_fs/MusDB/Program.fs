@@ -46,7 +46,7 @@ let otherFiles = filter (fun x -> x.Type = "") allFiles
 let flacFiles = filter (fun x -> x.Type = "flac") musicFiles
 let mp3Files = filter (fun x -> x.Type = "mp3") musicFiles
 
-let hashConflictFiles = flatten <| sames hashp musicFiles
+let hashConflictFiles = concat <| sames hashp musicFiles
 
 CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
 
