@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {}
+    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {}
   },
   "projects": {
-    "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {
+    "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj": {
       "version": "1.1.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
+        "projectUniqueName": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
         "projectName": "MusDB",
-        "projectPath": "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
+        "projectPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
         "packagesPath": "C:\\Users\\Thaumy\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\obj\\",
+        "outputPath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

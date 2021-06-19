@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Xa0r+UIDPsMxw5g75VNAv6Pf4/VwSZcTJKaJZR0CgG1IsQLA9UZigRjTqfhL8W1kQiu90R8p6j4eKM20EwIvQQ==",
+  "dgSpecHash": "v/UGeELXitQEVXn0SKf2TF6Yqtyaw/8enVPm1OQ4uQ0/ZtktnE0mPsNtzR0UlegSGxEWa3qgUIZzjCYRVBL3ug==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Thaumy\\Desktop\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
+  "projectFilePath": "C:\\Users\\Thaumy\\Desktop\\GitHub\\MusDB\\MusDB_fs\\MusDB\\MusDB.fsproj",
   "expectedPackageFiles": [
     "C:\\Users\\Thaumy\\.nuget\\packages\\bouncycastle.netcore\\1.8.5\\bouncycastle.netcore.1.8.5.nupkg.sha512",
     "C:\\Users\\Thaumy\\.nuget\\packages\\fsharp.core\\5.0.0\\fsharp.core.5.0.0.nupkg.sha512",
