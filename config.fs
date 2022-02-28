@@ -1,15 +1,17 @@
-﻿module App.Config
+﻿module config
 
 open System.IO
 open System.Text
 open Newtonsoft.Json.Linq
+open MySqlManaged
 
 
 let getConfig configPath =
     let jsonString =
         try //尝试获取配置文件
             File.ReadAllText(configPath, Encoding.UTF8)
-        with _ -> //找不到配置文件则创建
+        with
+        | _ -> //找不到配置文件则创建
             use fileStream =
                 new FileStream(configPath, FileMode.Create, FileAccess.Write)
 
@@ -21,9 +23,15 @@ let getConfig configPath =
 
             File.ReadAllText(configPath, Encoding.UTF8)
 
-    let jObject = JObject.Parse jsonString
+    let root = JObject.Parse jsonString
+    let path = root.Value<string> "path"
+    let database = root.["database"]
+    let schema = database.Value<string> "schema"
 
-    (jObject.["path"], jObject.["database"])
-    ||> fun path database ->
-            (path.ToString(), (database.["usr"].ToString(), database.["pwd"].ToString(), database.["db"].ToString()))
-    ||> fun path database -> (path, database)
+    let msg =
+        { DataSource = root.Value<string> "datasource"
+          Port = root.Value<uint16> "port"
+          User = database.Value<string> "usr"
+          Password = database.Value<string> "pwd" }
+
+    (path, schema, msg)

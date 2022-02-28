@@ -1,4 +1,4 @@
-# compiled source
+# compiled
 *.class
 *.com
 *.dll
@@ -8,7 +8,7 @@
 *.o
 *.a
 
-# packages
+# package
 *.dmg
 *.iso
 *.jar
@@ -18,11 +18,14 @@
 *.7z
 *.gz
 
-# logs and databases
+# log
 *.log
 
-# OS generated files
+# os
+System Volume Information
 .Spotlight-V100
+$Recycle.Bin
+.Trash-1000
 ehthumbs.db
 .DS_Store?
 .DS_Store
@@ -35,13 +38,13 @@ dist_electron
 node_modules
 dist
 
-# editor directories and files
+# editor
 .gradle
 .vscode
 .idea
 .vs
 
-# local env files
+# local env
 .env.*.local
 .env.local
 
