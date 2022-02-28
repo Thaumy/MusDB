@@ -1,14 +1,13 @@
-﻿module App.Checker
+﻿module checker
 
 open System
 open System.IO
 open System.Linq
 open System.Collections.Generic
 open System.Security.Cryptography
-open App
-open Util
-open Mod
-open CLI
+open fsharper.fn
+open types
+open ui
 
  let showMusic musicName isFlac musicPath =
     let (text,color)=if isFlac then ("FLAC",ConsoleColor.Cyan) else ("MP3 ",ConsoleColor.White)

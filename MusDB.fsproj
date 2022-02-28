@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="fn.fs" />
+        <Compile Include="types.fs" />
+        <Compile Include="ui.fs" />
+        <Compile Include="config.fs" />
+        <Compile Include="checker.fs" />
+        <Compile Include="database.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="fsharper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\repo\fsharper\fsharper\bin\Debug\net6.0\fsharper.dll</HintPath>
+      </Reference>
+      <Reference Include="MySqlManaged, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\repo\MySqlManaged\bin\Debug\net6.0\MySqlManaged.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MySql.Data" Version="8.0.28" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
+
+</Project>

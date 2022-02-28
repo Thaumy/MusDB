@@ -1,4 +1,4 @@
-﻿module Mod
+﻿module types
 
 type File =
     { Name: string

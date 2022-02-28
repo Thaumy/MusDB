@@ -1,4 +1,4 @@
-﻿module App.CLI
+﻿module ui
 
 open System
 open System.Text
