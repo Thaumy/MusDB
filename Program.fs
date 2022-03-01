@@ -26,7 +26,7 @@ while true do
 
     CLI.InColor ConsoleColor.Yellow (fun _ -> CLI.Line "正在运行MUSDB音乐统计工作流\n")
     CLI.Line "查找配置文件信息 ......................[    ]"
-
+    
     let currPath =
         $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
 

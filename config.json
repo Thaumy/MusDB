@@ -1,6 +1,7 @@
 {
     "path": "/home/thaumy/Music",
     "database": {
+        "schema":"musdb",
         "table": "statistics",
         "datasource": "localhost",
         "port": 3306,

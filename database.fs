@@ -16,6 +16,8 @@ type Database(msg, schema, table) =
 
     member this.GetCount =
         managed.getFstVal $"SELECT COUNT(*) FROM {table}"
+        |> unwarp
+        |> unwarp
         |> Convert.ToInt32
 
     member this.GetAll =
