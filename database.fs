@@ -11,8 +11,8 @@ open fsharper.ethType.ethResult
 open checker
 
 
-type Database(msg, table) =
-    let managed = MySqlManaged(msg)
+type Database(msg, schema, table) =
+    let managed = MySqlManaged(msg, schema)
 
     member this.GetCount =
         managed.getFstVal $"SELECT COUNT(*) FROM {table}"
