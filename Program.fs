@@ -30,12 +30,12 @@ while true do
     let currPath =
         $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
 
-    let (musicPath, schema, msg) = getConfig currPath
+    let (musicPath, msg, schema, table) = getConfig currPath
 
     CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
 
     CLI.Line "联络到数据库 ..........................[    ]"
-    let database = Database(msg,schema)
+    let database = Database(msg, schema, table)
     CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
 
     CLI.Line $"\n当前数据库曲目登记数量 : {database.GetCount}"

@@ -29,9 +29,11 @@ let getConfig configPath =
     let schema = database.Value<string> "schema"
 
     let msg =
-        { DataSource = root.Value<string> "datasource"
-          Port = root.Value<uint16> "port"
+        { DataSource = database.Value<string> "datasource"
+          Port = database.Value<uint16> "port"
           User = database.Value<string> "usr"
           Password = database.Value<string> "pwd" }
 
-    (path, schema, msg)
+    let table = database.Value<string> "table"
+
+    (path, msg, schema, table)
