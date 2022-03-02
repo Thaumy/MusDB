@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Linq
 open System.Collections.Generic
+open fsharper.ethType.ethOption
 open System.Security.Cryptography
 open fsharper.fn
 open types
@@ -31,10 +32,7 @@ let toSha256 path =
     |> fun it -> it.ComputeHash file |> BitConverter.ToString
 
 let getFileSystemInfosList path =
-    map
-        id
-        [ for x in ( DirectoryInfo(path)).GetFileSystemInfos() do
-              x ]
+    map id [ for x in DirectoryInfo(path).GetFileSystemInfos() -> x ]
 
 let rec getAllFiles (list: FileSystemInfo list) =
     match list with
@@ -70,7 +68,7 @@ let rec getAllFiles (list: FileSystemInfo list) =
         | _ -> []
     | [] -> []
 
-let checkConflicts (files: File list) =
+let checkConflicts (files: MusicFile list) =
     [ for el in files.GroupBy(fun el -> el.Sha256) do
           if el.Count() > 1 then
               for it in el -> it ]

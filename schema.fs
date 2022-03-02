@@ -1,47 +1,65 @@
 module schema
 
 open System
+open System.Data
 open MySqlManaged
-open MySql.Data.MySqlClient
+open fsharper.moreType.GenericPipable
 open types
 open fsharper.op
 open fsharper.fn
 open fsharper.moreType.Ord
+open fsharper.ethType.ethOption
 open fsharper.ethType.ethResult
-open checker
 
+//let mutable path: Option<string> = None
+let mutable msg: Option<MySqlConnMsg> = None
+let mutable schemaName: Option<string> = None
+let mutable table: Option<string> = None
 
-type Schema(msg, schema, table) =
-    let managed = MySqlManaged(msg, schema)
+let mutable managed: Option<MySqlManaged> = None
 
-    member this.getCount =
-        managed.getFstVal $"SELECT COUNT(*) FROM {table}"
-        |> unwarp
-        |> unwarp
-        |> Convert.ToInt32
+let private FetchManagedPipeline =
+    let activate () =
+        let m =
+            MySqlManaged(msg.unwarp (), schemaName.unwarp ())
 
-    member this.getAll =
-        let result =
-            [ for el in
-                  (managed.getTable "SELECT * FROM statistics")
-                      .unwarp()
-                      .Rows do
-                  el ]
+        managed <- Some m
+        m
 
-        let f (row: Data.DataRow) =
-            { Name = row.["name"].ToString()
-              Type = row.["type"].ToString()
-              Sha256 = row.["sha256"].ToString()
-              Path = "" }
+    let activated () = managed.unwarp ()
 
-        map f result
+    GenericStatePipe(activate = activate, activated = activated)
+        .build ()
 
-    member this.add(file: File) =
-        managed.execute
-            $"INSERT INTO statistics (name,type,sha256) VALUES \
+let private Managed () = FetchManagedPipeline.invoke ()
+
+let count () =
+    Managed()
+        .getFstVal $"SELECT COUNT(*) FROM {table.unwarp ()}"
+    |> unwarp
+    |> unwarp
+    |> Convert.ToInt32
+
+let files () =
+    Managed()
+        .getTable $"SELECT * FROM {table.unwarp ()}"
+    >>= fun t ->
+            [ for r in t.Rows -> r ]
+            |> map
+                (fun (r: DataRow) ->
+                    { Name = r.["name"].ToString()
+                      Type = r.["type"].ToString()
+                      Sha256 = r.["sha256"].ToString()
+                      Path = "" })
+            |> Ok
+    |> unwarp
+
+let add (file: MusicFile) =
+    Managed()
+        .execute $"INSERT INTO statistics (name,type,sha256) VALUES \
                   (\"{file.Name}\",\"{file.Type}\",\"{file.Sha256}\");"
-        >>= fun f ->
-                match f <| eq 1 with
-                | 1 -> Ok true
-                | _ -> Ok false
-        |> unwarp
+    >>= fun f ->
+            match f <| eq 1 with
+            | 1 -> Ok true
+            | _ -> Ok false
+    |> unwarp

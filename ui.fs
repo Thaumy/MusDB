@@ -8,7 +8,7 @@ let inColor color todo : unit =
     todo ()
     Console.ForegroundColor <- ConsoleColor.White
 
-let inPosition L R todo : unit =
+let inCoordinate L R todo : unit =
     Console.SetCursorPosition(L, R)
     todo ()
 

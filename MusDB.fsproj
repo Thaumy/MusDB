@@ -9,9 +9,9 @@
         <Compile Include="fn.fs" />
         <Compile Include="types.fs" />
         <Compile Include="ui.fs" />
-        <Compile Include="config.fs" />
-        <Compile Include="checker.fs" />
         <Compile Include="schema.fs" />
+        <Compile Include="checker.fs" />
+        <Compile Include="config.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
