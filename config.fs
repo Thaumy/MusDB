@@ -4,10 +4,10 @@ open System.IO
 open System.Text
 open Newtonsoft.Json.Linq
 open MySqlManaged
+open fsharper.ethType.ethOption
 
-
-let getConfig configPath =
-    let jsonString =
+let useConfig configPath =
+    let config =
         try //尝试获取配置文件
             File.ReadAllText(configPath, Encoding.UTF8)
         with
@@ -23,17 +23,18 @@ let getConfig configPath =
 
             File.ReadAllText(configPath, Encoding.UTF8)
 
-    let root = JObject.Parse jsonString
-    let path = root.Value<string> "path"
+    let root = JObject.Parse config
     let database = root.["database"]
-    let schema = database.Value<string> "schema"
 
-    let msg =
-        { DataSource = database.Value<string> "datasource"
-          Port = database.Value<uint16> "port"
-          User = database.Value<string> "usr"
-          Password = database.Value<string> "pwd" }
+    schema.schemaName <- Some <| database.Value<string> "schema"
 
-    let table = database.Value<string> "table"
+    schema.msg <-
+        Some
+        <| { DataSource = database.Value<string> "datasource"
+             Port = database.Value<uint16> "port"
+             User = database.Value<string> "usr"
+             Password = database.Value<string> "pwd" }
 
-    (path, msg, schema, table)
+    schema.table <- Some <| database.Value<string> "table"
+
+    root.Value<string> "path"

@@ -6,7 +6,6 @@ open types
 open ui
 open config
 open checker
-open schema
 
 while true do
 
@@ -21,25 +20,26 @@ while true do
     inColor ConsoleColor.Yellow (fun _ -> line "正在运行MUSDB音乐统计工作流\n")
     line "查找配置文件信息 ......................[    ]"
 
-    let currPath =
-        $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
 
-    let (musicPath, msg, schema, table) = getConfig currPath
 
-    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
+    let musicPath =
+        useConfig $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
+
+    inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
     line "联络到数据库 ..........................[    ]"
-    let schema = Schema(msg, schema, table)
-    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
-    line $"\n当前数据库曲目登记数量 : {schema.getCount}"
+    inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
+
+    line $"\n当前数据库曲目登记数量 : {schema.count ()}"
 
     put "\npress "
     inColor ConsoleColor.Green (fun _ -> put "ENTER")
     pause " to collect data\n" |> ignore
 
-    line "数据聚合 ..............................[    ]"
-
+    line "已开始数据聚合 ........................[    ]"
+    inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
+    
     let allInfoList = getFileSystemInfosList musicPath
     let allFiles = getAllFiles allInfoList
 
@@ -54,7 +54,7 @@ while true do
 
     let hashConflictFiles = concat <| sames hashp musicFiles
 
-    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
+    inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
     line $"\n共计 : {musicFiles.Length}    FLAC : {flacFiles.Length}    MP3 : {mp3Files.Length}\n"
 
@@ -65,7 +65,7 @@ while true do
         (fun x ->
             put x.Name
             inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
-            newLine())
+            newLine ())
         otherFiles
 
 
@@ -77,14 +77,14 @@ while true do
                (fun x ->
                    put x.Name
                    inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
-                   newLine())
+                   newLine ())
                hashConflictFiles
            |> ignore
        else
            ()
 
 
-    let musicInSchema = schema.getAll
+    let musicInSchema = schema.files ()
 
     let musicLocalOnly = (leftOnly p musicFiles musicInSchema)
     let musicDbOnly = (leftOnly p musicInSchema musicFiles)
@@ -106,7 +106,7 @@ while true do
                (fun x ->
                    put x.Name
                    inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
-                   newLine())
+                   newLine ())
                musicLocalOnly
 
            inColor ConsoleColor.Green (fun _ -> pause "\n按任意键将新增数据录入数据库\n" |> ignore)
