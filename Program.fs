@@ -1,55 +1,47 @@
 open System
-open types
-open fn
+
 open fsharper.fn
+open fn
+open types
 open ui
 open config
 open checker
-open database
+open schema
 
 while true do
 
     //Eq predicate
     let p a b =
-        if a.Name = b.Name
-           && a.Sha256 = b.Sha256
-           && a.Type = b.Type then
-            true
-        else
-            false
+        a.Name = b.Name
+        && a.Sha256 = b.Sha256
+        && a.Type = b.Type
 
-    let hashp a b =
-        if a.Sha256 = b.Sha256 then
-            true
-        else
-            false
+    let hashp a b = a.Sha256 = b.Sha256
 
-    CLI.InColor ConsoleColor.Yellow (fun _ -> CLI.Line "正在运行MUSDB音乐统计工作流\n")
-    CLI.Line "查找配置文件信息 ......................[    ]"
-    
+    inColor ConsoleColor.Yellow (fun _ -> line "正在运行MUSDB音乐统计工作流\n")
+    line "查找配置文件信息 ......................[    ]"
+
     let currPath =
         $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
 
     let (musicPath, msg, schema, table) = getConfig currPath
 
-    CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
-    CLI.Line "联络到数据库 ..........................[    ]"
-    let database = Database(msg, schema, table)
-    CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+    line "联络到数据库 ..........................[    ]"
+    let schema = Schema(msg, schema, table)
+    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
-    CLI.Line $"\n当前数据库曲目登记数量 : {database.GetCount}"
+    line $"\n当前数据库曲目登记数量 : {schema.getCount}"
 
+    put "\npress "
+    inColor ConsoleColor.Green (fun _ -> put "ENTER")
+    pause " to collect data\n" |> ignore
 
-    let _ =
-        CLI.Put "\npress "
-        CLI.InColor ConsoleColor.Green (fun _ -> CLI.Put "ENTER")
-        CLI.Pause " to collect data\n"
+    line "数据聚合 ..............................[    ]"
 
-    CLI.Line "数据聚合 ..............................[    ]"
-
-    let allInfoList = Checker.GetFileSystemInfosList musicPath
-    let allFiles = Checker.GetAllFiles allInfoList
+    let allInfoList = getFileSystemInfosList musicPath
+    let allFiles = getAllFiles allInfoList
 
     let musicFiles = filter (fun x -> x.Type <> "") allFiles
     let otherFiles = filter (fun x -> x.Type = "") allFiles
@@ -62,84 +54,84 @@ while true do
 
     let hashConflictFiles = concat <| sames hashp musicFiles
 
-    CLI.InPosition 40 (Console.CursorTop - 1) (fun _ -> CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "DONE"))
+    inPosition 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
-    CLI.Line $"\n共计 : {musicFiles.Length}    FLAC : {flacFiles.Length}    MP3 : {mp3Files.Length}\n"
+    line $"\n共计 : {musicFiles.Length}    FLAC : {flacFiles.Length}    MP3 : {mp3Files.Length}\n"
 
-    let _ =
-        CLI.InColor ConsoleColor.Yellow (fun _ -> CLI.Line "存在其他项目 :")
+    inColor ConsoleColor.Yellow (fun _ -> line "存在其他项目 :")
 
-        map
-            (fun x ->
-                CLI.Put x.Name
-                CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight x.Path)
-                CLI.newLine)
-            otherFiles
-
-    let _ =
-        if hashConflictFiles.Length <> 0 then
-            CLI.InColor ConsoleColor.Red (fun _ -> CLI.Line "\n存在冲突曲目 :")
-
-            map
-                (fun x ->
-                    CLI.Put x.Name
-                    CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight x.Path)
-                    CLI.newLine)
-                hashConflictFiles
-            |> ignore
-        else
-            ()
-
-    let musicInDb = database.GetAll
-
-    let musicLocalOnly = (leftOnly p musicFiles musicInDb)
-    let musicDbOnly = (leftOnly p musicInDb musicFiles)
-
-    let _ =
-        if musicDbOnly.Length <> 0 then
-            CLI.InColor ConsoleColor.Red (fun _ -> CLI.Line "\n发现已登记曲目缺失 :")
-
-            map (fun x -> CLI.Line x.Name) musicDbOnly
-            |> ignore
-        else
-            CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "\n已登记的曲目全部存在。")
-
-    let _ =
-        if musicLocalOnly.Length <> 0 then
-            CLI.InColor ConsoleColor.Green (fun _ -> CLI.Line "\n发现新增曲目 :")
-
-            map
-                (fun x ->
-                    CLI.Put x.Name
-                    CLI.InColor ConsoleColor.DarkGray (fun _ -> CLI.InRight x.Path)
-                    CLI.newLine)
-                musicLocalOnly
-            |> ignore
-
-            CLI.InColor ConsoleColor.Green (fun _ -> CLI.Pause "\n按任意键将新增数据录入数据库\n" |> ignore)
-        else
-            CLI.InColor ConsoleColor.Gray (fun _ -> CLI.Line "\n无新增曲目。")
+    ignore
+    <| map
+        (fun x ->
+            put x.Name
+            inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
+            newLine())
+        otherFiles
 
 
-    let _ =
-        map
-            (fun x ->
-                let isSuccess = database.Add x
+    ignore
+    <| if hashConflictFiles.Length <> 0 then
+           inColor ConsoleColor.Red (fun _ -> line "\n存在冲突曲目 :")
 
-                CLI.InColor
-                    (if isSuccess then
-                         ConsoleColor.Green
-                     else
-                         ConsoleColor.Red)
-                    (fun _ ->
-                        CLI.Put(
-                            if isSuccess then
-                                "Added : "
-                            else
-                                "Failed: "
-                        ))
+           map
+               (fun x ->
+                   put x.Name
+                   inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
+                   newLine())
+               hashConflictFiles
+           |> ignore
+       else
+           ()
 
-                CLI.Line $"{x.Name}")
-            musicLocalOnly
 
-    CLI.InColor ConsoleColor.White (fun _ -> CLI.Pause "\n按任意键重新开始检查\n" |> ignore)
+    let musicInSchema = schema.getAll
+
+    let musicLocalOnly = (leftOnly p musicFiles musicInSchema)
+    let musicDbOnly = (leftOnly p musicInSchema musicFiles)
+
+    ignore
+    <| if musicDbOnly.Length <> 0 then
+           inColor ConsoleColor.Red (fun _ -> line "\n发现已登记曲目缺失 :")
+
+           map (fun x -> line x.Name) musicDbOnly |> ignore
+       else
+           inColor ConsoleColor.Green (fun _ -> line "\n已登记的曲目全部存在。")
+
+    ignore
+    <| if musicLocalOnly.Length <> 0 then
+           inColor ConsoleColor.Green (fun _ -> line "\n发现新增曲目 :")
+
+           ignore
+           <| map
+               (fun x ->
+                   put x.Name
+                   inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
+                   newLine())
+               musicLocalOnly
+
+           inColor ConsoleColor.Green (fun _ -> pause "\n按任意键将新增数据录入数据库\n" |> ignore)
+       else
+           inColor ConsoleColor.Gray (fun _ -> line "\n无新增曲目。")
+
+    ignore
+    <| map
+        (fun x ->
+            let isSuccess = schema.add x
+
+            inColor
+                (if isSuccess then
+                     ConsoleColor.Green
+                 else
+                     ConsoleColor.Red)
+                (fun _ ->
+                    put (
+                        if isSuccess then
+                            "Added : "
+                        else
+                            "Failed: "
+                    ))
+
+            line $"{x.Name}")
+        musicLocalOnly
+
+    inColor ConsoleColor.White (fun _ -> pause "\n按任意键重新开始检查\n" |> ignore)

@@ -11,7 +11,7 @@
         <Compile Include="ui.fs" />
         <Compile Include="config.fs" />
         <Compile Include="checker.fs" />
-        <Compile Include="database.fs" />
+        <Compile Include="schema.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

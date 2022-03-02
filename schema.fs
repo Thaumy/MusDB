@@ -1,4 +1,4 @@
-module database
+module schema
 
 open System
 open MySqlManaged
@@ -11,16 +11,16 @@ open fsharper.ethType.ethResult
 open checker
 
 
-type Database(msg, schema, table) =
+type Schema(msg, schema, table) =
     let managed = MySqlManaged(msg, schema)
 
-    member this.GetCount =
+    member this.getCount =
         managed.getFstVal $"SELECT COUNT(*) FROM {table}"
         |> unwarp
         |> unwarp
         |> Convert.ToInt32
 
-    member this.GetAll =
+    member this.getAll =
         let result =
             [ for el in
                   (managed.getTable "SELECT * FROM statistics")
@@ -36,7 +36,7 @@ type Database(msg, schema, table) =
 
         map f result
 
-    member this.Add(file: File) =
+    member this.add(file: File) =
         managed.execute
             $"INSERT INTO statistics (name,type,sha256) VALUES \
                   (\"{file.Name}\",\"{file.Type}\",\"{file.Sha256}\");"
