@@ -8,15 +8,14 @@ open types
 open fsharper.op
 open fsharper.fn
 open fsharper.moreType.Ord
-open fsharper.ethType.ethOption
-open fsharper.ethType.ethResult
+open fsharper.enhType
 
-//let mutable path: Option<string> = None
-let mutable msg: Option<MySqlConnMsg> = None
-let mutable schemaName: Option<string> = None
-let mutable table: Option<string> = None
 
-let mutable managed: Option<MySqlManaged> = None
+let mutable msg: Option'<MySqlConnMsg> = None
+let mutable schemaName: Option'<string> = None
+let mutable table: Option'<string> = None
+
+let mutable managed: Option'<MySqlManaged> = None
 
 let private FetchManagedPipeline =
     let activate () =

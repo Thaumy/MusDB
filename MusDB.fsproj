@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="fn.fs" />
         <Compile Include="types.fs" />
         <Compile Include="ui.fs" />
         <Compile Include="schema.fs" />

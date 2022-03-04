@@ -4,7 +4,7 @@ open System.IO
 open System.Text
 open Newtonsoft.Json.Linq
 open MySqlManaged
-open fsharper.ethType.ethOption
+open fsharper.enhType
 
 let useConfig configPath =
     let config =
