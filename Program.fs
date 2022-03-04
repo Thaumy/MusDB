@@ -1,7 +1,6 @@
 open System
 
 open fsharper.fn
-open fn
 open types
 open ui
 open config
@@ -9,18 +8,8 @@ open checker
 
 while true do
 
-    //Eq predicate
-    let p a b =
-        a.Name = b.Name
-        && a.Sha256 = b.Sha256
-        && a.Type = b.Type
-
-    let hashp a b = a.Sha256 = b.Sha256
-
     inColor ConsoleColor.Yellow (fun _ -> line "正在运行MUSDB音乐统计工作流\n")
     line "查找配置文件信息 ......................[    ]"
-
-
 
     let musicPath =
         useConfig $"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}config.json"
@@ -39,24 +28,30 @@ while true do
 
     line "已开始数据聚合 ........................[    ]"
     inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
-    
-    let allInfoList = getFileSystemInfosList musicPath
-    let allFiles = getAllFiles allInfoList
 
-    let musicFiles = filter (fun x -> x.Type <> "") allFiles
-    let otherFiles = filter (fun x -> x.Type = "") allFiles
+    let localFiles =
+        getFileSystemInfosList musicPath |> getLocalFiles
 
-    let flacFiles =
-        filter (fun x -> x.Type = "flac") musicFiles
+    let localMusicFiles =
+        filter (fun x -> x.Type <> "") localFiles
+        |> map (fun x -> { x with Path = "" })
 
-    let mp3Files =
-        filter (fun x -> x.Type = "mp3") musicFiles
+    let localOtherFiles =
+        filter (fun x -> x.Type = "") localFiles
+        |> map (fun x -> { x with Path = "" })
 
-    let hashConflictFiles = concat <| sames hashp musicFiles
+    let localFlacFiles =
+        filter (fun x -> x.Type = "flac") localMusicFiles
+
+    let localMp3Files =
+        filter (fun x -> x.Type = "mp3") localMusicFiles
+
+    let hashConflictFiles =
+        duplicateWhen (fun x y -> x.Sha256 = y.Sha256) localMusicFiles
 
     inCoordinate 40 (Console.CursorTop - 1) (fun _ -> inColor ConsoleColor.Green (fun _ -> line "DONE"))
 
-    line $"\n共计 : {musicFiles.Length}    FLAC : {flacFiles.Length}    MP3 : {mp3Files.Length}\n"
+    line $"\n共计 : {localMusicFiles.Length}    FLAC : {localFlacFiles.Length}    MP3 : {localMp3Files.Length}\n"
 
     inColor ConsoleColor.Yellow (fun _ -> line "存在其他项目 :")
 
@@ -66,7 +61,7 @@ while true do
             put x.Name
             inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
             newLine ())
-        otherFiles
+        localOtherFiles
 
 
     ignore
@@ -84,21 +79,25 @@ while true do
            ()
 
 
-    let musicInSchema = schema.files ()
+    let schemaMusicFiles = schema.files ()
 
-    let musicLocalOnly = (leftOnly p musicFiles musicInSchema)
-    let musicDbOnly = (leftOnly p musicInSchema musicFiles)
+    let localOnlyMusicFiles =
+        (leftJoinNoInner localMusicFiles schemaMusicFiles)
+
+    let schemaOnlyMusicFiles =
+        (leftJoinNoInner schemaMusicFiles localMusicFiles)
 
     ignore
-    <| if musicDbOnly.Length <> 0 then
+    <| if schemaOnlyMusicFiles.Length <> 0 then
            inColor ConsoleColor.Red (fun _ -> line "\n发现已登记曲目缺失 :")
 
-           map (fun x -> line x.Name) musicDbOnly |> ignore
+           map (fun x -> line x.Name) schemaOnlyMusicFiles
+           |> ignore
        else
            inColor ConsoleColor.Green (fun _ -> line "\n已登记的曲目全部存在。")
 
     ignore
-    <| if musicLocalOnly.Length <> 0 then
+    <| if localOnlyMusicFiles.Length <> 0 then
            inColor ConsoleColor.Green (fun _ -> line "\n发现新增曲目 :")
 
            ignore
@@ -107,31 +106,35 @@ while true do
                    put x.Name
                    inColor ConsoleColor.DarkGray (fun _ -> inRight x.Path)
                    newLine ())
-               musicLocalOnly
+               localOnlyMusicFiles
 
-           inColor ConsoleColor.Green (fun _ -> pause "\n按任意键将新增数据录入数据库\n" |> ignore)
+           inColor
+               ConsoleColor.Green
+               (fun _ ->
+                   match pause "\ny：将新增数据录入数据库，其他键：重新开始检查\n" with
+                   | "y" ->
+                       ignore
+                       <| map
+                           (fun x ->
+                               let isSuccess = schema.add x
+
+                               inColor
+                                   (if isSuccess then
+                                        ConsoleColor.Green
+                                    else
+                                        ConsoleColor.Red)
+                                   (fun _ ->
+                                       put (
+                                           if isSuccess then
+                                               "Added : "
+                                           else
+                                               "Failed: "
+                                       ))
+
+                               line $"{x.Name}")
+                           localOnlyMusicFiles
+
+                       inColor ConsoleColor.White (fun _ -> pause "\n按任意键重新开始检查\n" |> ignore)
+                   | _ -> ())
        else
            inColor ConsoleColor.Gray (fun _ -> line "\n无新增曲目。")
-
-    ignore
-    <| map
-        (fun x ->
-            let isSuccess = schema.add x
-
-            inColor
-                (if isSuccess then
-                     ConsoleColor.Green
-                 else
-                     ConsoleColor.Red)
-                (fun _ ->
-                    put (
-                        if isSuccess then
-                            "Added : "
-                        else
-                            "Failed: "
-                    ))
-
-            line $"{x.Name}")
-        musicLocalOnly
-
-    inColor ConsoleColor.White (fun _ -> pause "\n按任意键重新开始检查\n" |> ignore)

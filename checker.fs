@@ -3,8 +3,6 @@
 open System
 open System.IO
 open System.Linq
-open System.Collections.Generic
-open fsharper.ethType.ethOption
 open System.Security.Cryptography
 open fsharper.fn
 open types
@@ -34,13 +32,13 @@ let toSha256 path =
 let getFileSystemInfosList path =
     map id [ for x in DirectoryInfo(path).GetFileSystemInfos() -> x ]
 
-let rec getAllFiles (list: FileSystemInfo list) =
+let rec getLocalFiles (list: FileSystemInfo list) =
     match list with
     | x :: xs ->
         match x with
         | :? DirectoryInfo as di ->
-            getAllFiles (getFileSystemInfosList di.FullName)
-            @ getAllFiles xs
+            getLocalFiles (getFileSystemInfosList di.FullName)
+            @ getLocalFiles xs
         | :? FileInfo as fi ->
             match true with
             | _ when fi.Name.Contains ".flac" ->
@@ -50,7 +48,7 @@ let rec getAllFiles (list: FileSystemInfo list) =
                   Sha256 = toSha256 fi.FullName
                   Path = fi.DirectoryName
                   Type = "flac" }
-                :: getAllFiles xs
+                :: getLocalFiles xs
             | _ when fi.Name.Contains ".mp3" ->
                 showMusic fi.Name false fi.DirectoryName
 
@@ -58,13 +56,13 @@ let rec getAllFiles (list: FileSystemInfo list) =
                   Sha256 = toSha256 fi.FullName
                   Path = fi.DirectoryName
                   Type = "mp3" }
-                :: getAllFiles xs
+                :: getLocalFiles xs
             | _ ->
                 { Name = fi.Name
                   Sha256 = toSha256 fi.FullName
                   Path = fi.DirectoryName
                   Type = "" }
-                :: getAllFiles xs
+                :: getLocalFiles xs
         | _ -> []
     | [] -> []
 

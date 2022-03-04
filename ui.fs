@@ -3,10 +3,11 @@
 open System
 open System.Text
 
-let inColor color todo : unit =
+let inColor color todo =
     Console.ForegroundColor <- color
-    todo ()
+    let result = todo ()
     Console.ForegroundColor <- ConsoleColor.White
+    result
 
 let inCoordinate L R todo : unit =
     Console.SetCursorPosition(L, R)
